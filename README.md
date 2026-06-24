@@ -18,13 +18,13 @@
   - request body: credentials (username, password)
   - response body: user info
   - response status: 200 successful login, 401 wrong credentials, 500 internal server error
-  - response body example (in case of success): { id: 1, username: 'mario', email: 'mario@example.com' }
+  - response body example (in case of success): { id: 1, username: 'stefano@polito.it', name: 'Stefano' }
 - GET `/api/sessions/current`
   - request parameters: cookie for passport authentication
   - request body: none
   - response body: user info
   - response status: 200 success, 401 not authenticated, 500 internal server error
-  - response body example (in case of success): { id: 1, username: 'mario', email: 'mario@example.com' }
+  - response body example (in case of success): { id: 1, username: 'stefano@polito.it', name: 'Stefano' }
 - DELETE `/api/sessions/current`
   - request parameters: cookie for passport authentication
   - request body: none
@@ -75,12 +75,12 @@
 
 ## Database Tables
 
-- Table `users` - contains id, username, email, password (hashed password), salt (for hashing password)
+- Table `users` -  contains id, username, name, hash (hashed password), salt (salt used for hashing the password)
 - Table `tournaments` - contains id, code (used to join the tournament), difficulty (easy,medium,hard), grid_size (N of NxN)
-- Table `tournaments_ships` - contains id, tournament_id, size(number of cells occupied by the ship), row (starting row of the ship), col (starting column of the ship), direction ('H' for horizontal, 'V' for vertical). It is copied into ships table when a new player joins
+- Table `tournament_ships` - contains tournament_id, size (number of cells occupied by the ship), row (starting row of the ship), col (starting column of the ship), direction ('H' for horizontal, 'V' for vertical). Primary key is (tournament_id, row, col). It is copied into ships table when a new player joins
 - Table `games` - contains id, user_id (NULL if casual mode), tournament_id (NULL if casual mode), difficulty (easy, medium, hard), grid_size (N of NxN), missiles (number of missiles remaining), status ('ongoing', 'won', 'lost'), created_at
-- Table `ships` - contains id, game_id, size, row (starting row of the ship), col (starting column of the ship), direction ('H' for horizontal, 'V' for vertical), sunk (0 if still afloat, 1 if sunk). For tournament games, coordinates are copied from tournament_ships at game creation.
-- Table `shots` - contain game_id, row, col (coordinates of the shot), result ('water','hit','sunk')
+- Table `ships` - contains game_id, size, row (starting row of the ship), col (starting column of the ship), direction ('H' for horizontal, 'V' for vertical), sunk (0 if still afloat, 1 if sunk). Primary key is (game_id, row, col).  For tournament games, coordinates are copied from tournament_ships at game creation.
+- Table `shots` - contains game_id, row, col (coordinates of the shot), result ('water', 'hit', 'sunk'). Primary key is (game_id, row, col).
 
 ## Main React Components
 
@@ -96,8 +96,9 @@
 
 ## Users Credentials
 
-- username, password (plus any other requested info)
-- username, password (plus any other requested info)
+- username: stefano@polito.it, password: passwordStefano
+- username: marina@polito.it, password: passwordMarina
+- username: francesco@polito.it, password: passwordFrancesco
 
 ## Use of AI Tools
 Briefly describe whether you used any AI tools (e.g., ChatGPT, GitHub Copilot, Claude) while working on this project, for which purposes (e.g., clarifying concepts, debugging, generating code), and how you verified or adapted their output.
