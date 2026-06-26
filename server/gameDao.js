@@ -31,7 +31,7 @@ export const getGameById = (id) => {
   });
 };
 
-//aggiorna lo stato di un game (vinto o perso)
+//aggiorna lo stato di un game 
 export const updateGameStatus = (gameId, status) => {
   return new Promise((resolve, reject) => {
     const sql = 'UPDATE games SET status = ? WHERE id = ?';
@@ -54,6 +54,26 @@ export const updateMissiles = (gameId, missiles) => {
         reject(err);
       else
         resolve(this.changes);
+    });
+  });
+};
+
+// Restituisce le partite in corso di un utente
+export const getOngoingGamesByUser = (userId) => {
+  return new Promise((resolve, reject) => {
+    const sql = `SELECT games.id, games.difficulty, tournaments.code 
+                 FROM games LEFT JOIN tournaments 
+                 ON games.tournament_id = tournaments.id
+                 WHERE games.user_id = ? AND games.status = 'ongoing'`;
+    db.all(sql, [userId], (err, rows) => {
+      if (err)
+        reject(err);
+      else
+        resolve(rows.map(row => ({
+          gameId: row.id,
+          difficulty: row.difficulty,
+          tournamentCode: row.code
+        })));
     });
   });
 };

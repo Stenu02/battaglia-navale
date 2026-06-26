@@ -17,19 +17,19 @@
   - request parameters: none
   - request body: credentials (username, password)
   - response body: user info
-  - response status: 200 successful login, 401 wrong credentials, 500 internal server error
+  - response status: 200 successful login, 401 wrong credentials
   - response body example (in case of success): { id: 1, username: 'stefano@polito.it', name: 'Stefano' }
 - GET `/api/sessions/current`
   - request parameters: cookie for passport authentication
   - request body: none
   - response body: user info
-  - response status: 200 success, 401 not authenticated, 500 internal server error
+  - response status: 200 success, 401 not authenticated
   - response body example (in case of success): { id: 1, username: 'stefano@polito.it', name: 'Stefano' }
 - DELETE `/api/sessions/current`
   - request parameters: cookie for passport authentication
   - request body: none
   - response body: none
-  - response status: 200 successful logout, 500 internal server error
+  - response status: 200 successful logout
 - POST `/api/tournaments`
   - request parameters: cookie for passport authentication
   - request body: difficulty (easy, medium, hard)
@@ -46,7 +46,7 @@
   - request parameters: none
   - request body: difficulty (easy, medium, hard)
   - response body: game info
-  - response status: 201 Created, 401 Unauthorized (if user is authenticated), 422 Unprocessable Entity, 500 Internal Server Error
+  - response status: 201 Created, 403 Unauthorized (if user is authenticated), 422 Unprocessable Entity, 500 Internal Server Error
   - response body example (in case of success): { gameId: 1, gridSize: 5, ships: [2, 2, 3], missiles: 10 }
 - POST `/api/games/:id/shots`
   - request parameters: game id in the URL, cookie for passport authentication (optional, required for tournament games)
@@ -54,6 +54,12 @@
   - response body: shot result, updated game status
   - response status: 200 OK, 401 Unauthorized,403 Forbidden (game already ended), 404 Not Found (game does not exist), 409 Conflict (cell already fired upon), 422 Unprocessable Entity (invalid coordinates), 500 Internal Server Error
   - response body example (in case of success): { result: 'water', missiles: 9, status: 'ongoing' }
+- GET `/api/games`
+  - request parameters: cookie for passport authentication
+  - request body: none
+  - response body: ongoing games list
+  - response status: 200 OK, 401 Unauthorized, 500 Internal Server Error
+  - response body example: { games: [{ gameId: 4, difficulty: 'medium', tournamentCode: 'ALFA42' }, ...] }
 - GET `/api/games/:id`
   - request parameters: game id in the URL, cookie for passport authentication (optional, required for tournament games)
   - request body: none

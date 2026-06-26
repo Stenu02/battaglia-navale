@@ -43,3 +43,35 @@ export const getShotByCell = (gameId, row, col) => {
     });
   });
 };
+
+// Restituisce il numero di colpi ad una specifica nave
+export const getHitsByShip = (gameId, shipRow, shipCol, size, direction) => {
+  return new Promise((resolve, reject) => {
+    let sql;
+    if (direction === 'H') {
+      sql = `SELECT COUNT(*) as hits FROM shots 
+             WHERE game_id = ? 
+             AND row = ? 
+             AND col >= ? 
+             AND col < ?`;
+      db.get(sql, [gameId, shipRow, shipCol, shipCol + size], (err, row) => {
+        if (err)
+          reject(err);
+        else
+          resolve(row.hits);
+      });
+    } else {
+      sql = `SELECT COUNT(*) as hits FROM shots 
+             WHERE game_id = ? 
+             AND col = ? 
+             AND row >= ? 
+             AND row < ?`;
+      db.get(sql, [gameId, shipCol, shipRow, shipRow + size], (err, row) => {
+        if (err)
+          reject(err);
+        else
+          resolve(row.hits);
+      });
+    }
+  });
+};

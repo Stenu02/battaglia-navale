@@ -1,0 +1,209 @@
+# Battaglia Navale - API Test File
+
+
+## Login Stefano
+POST http://localhost:3001/api/sessions HTTP/1.1
+content-type: application/json
+
+{
+    "username": "stefano@polito.it",
+    "password": "passwordStefano"
+}
+
+###
+
+## Login Marina
+POST http://localhost:3001/api/sessions HTTP/1.1
+content-type: application/json
+
+{
+    "username": "marina@polito.it",
+    "password": "passwordMarina"
+}
+
+###
+
+## Login Francesco
+POST http://localhost:3001/api/sessions HTTP/1.1
+content-type: application/json
+
+{
+    "username": "francesco@polito.it",
+    "password": "passwordFrancesco"
+}
+
+###
+
+## Login con credenziali errate
+POST http://localhost:3001/api/sessions HTTP/1.1
+content-type: application/json
+
+{
+    "username": "stefano@polito.it",
+    "password": "passwordSbagliata"
+}
+
+###
+
+## Get current session
+GET http://localhost:3001/api/sessions/current HTTP/1.1
+
+###
+
+## Logout
+DELETE http://localhost:3001/api/sessions/current HTTP/1.1
+
+###
+
+### ==================== TOURNAMENTS ====================
+
+## Crea un torneo easy (richiede login)
+POST http://localhost:3001/api/tournaments HTTP/1.1
+content-type: application/json
+
+{
+    "difficulty": "easy"
+}
+
+###
+
+## Crea un torneo medium (richiede login)
+POST http://localhost:3001/api/tournaments HTTP/1.1
+content-type: application/json
+
+{
+    "difficulty": "medium"
+}
+
+###
+
+## Crea un torneo hard (richiede login)
+POST http://localhost:3001/api/tournaments HTTP/1.1
+content-type: application/json
+
+{
+    "difficulty": "hard"
+}
+
+###
+
+## Crea un torneo con difficoltà non valida (422)
+POST http://localhost:3001/api/tournaments HTTP/1.1
+content-type: application/json
+
+{
+    "difficulty": "impossible"
+}
+
+###
+
+## Join torneo esistente 
+POST http://localhost:3001/api/tournaments/CODE/join HTTP/1.1
+
+###
+
+## Join torneo non esistente (404)
+POST http://localhost:3001/api/tournaments/XXXXXX/join HTTP/1.1
+
+###
+
+### ==================== CASUAL GAME ====================
+
+## Crea una partita casual easy (utente anonimo)
+POST http://localhost:3001/api/games HTTP/1.1
+content-type: application/json
+
+{
+    "difficulty": "easy"
+}
+
+###
+
+## Crea una partita casual medium (utente anonimo)
+POST http://localhost:3001/api/games HTTP/1.1
+content-type: application/json
+
+{
+    "difficulty": "medium"
+}
+
+###
+
+## Crea una partita casual con difficoltà non valida (422)
+POST http://localhost:3001/api/games HTTP/1.1
+content-type: application/json
+
+{
+    "difficulty": "impossible"
+}
+
+###
+
+### ==================== SHOTS ====================
+
+## Lancia un missile 
+POST http://localhost:3001/api/games/ID/shots HTTP/1.1
+content-type: application/json
+
+{
+    "row": 1,
+    "col": 1
+}
+
+###
+
+## Lancia un missile con coordinate non valide (422)
+POST http://localhost:3001/api/games/11/shots HTTP/1.1
+content-type: application/json
+
+{
+    "row": 0,
+    "col": 0
+}
+
+###
+
+## Lancia un missile su cella già colpita (409)
+POST http://localhost:3001/api/games/ID/shots HTTP/1.1
+content-type: application/json
+
+{
+    "row": 1,
+    "col": 1
+}
+
+###
+
+### ==================== GAME STATE ====================
+
+## Recupera lo stato della partita 
+GET http://localhost:3001/api/games/ID HTTP/1.1
+
+###
+
+## Recupera lo stato di una partita non esistente (404)
+GET http://localhost:3001/api/games/9999 HTTP/1.1
+
+###
+
+## Recupera le posizioni delle navi a fine partita 
+GET http://localhost:3001/api/games/ID/ships HTTP/1.1
+
+###
+
+## Recupera le posizioni delle navi di una partita in corso (403)
+GET http://localhost:3001/api/games/ID/ships HTTP/1.1
+
+###
+
+### ==================== STATS ====================
+
+## Recupera le statistiche dell'utente (richiede login)
+GET http://localhost:3001/api/stats HTTP/1.1
+
+###
+
+## Recupera le statistiche senza essere autenticato (401)
+GET http://localhost:3001/api/stats HTTP/1.1
+
+###
