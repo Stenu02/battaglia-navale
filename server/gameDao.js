@@ -58,41 +58,39 @@ export const updateMissiles = (gameId, missiles) => {
   });
 };
 
-// Restituisce le partite in corso di un utente
-export const getOngoingGamesByUser = (userId) => {
+
+export const getGameByUserAndTournament = (userId, tournamentId) => {
   return new Promise((resolve, reject) => {
-    const sql = `SELECT games.id, games.difficulty, tournaments.code 
-                 FROM games LEFT JOIN tournaments 
-                 ON games.tournament_id = tournaments.id
-                 WHERE games.user_id = ? AND games.status = 'ongoing'`;
-    db.all(sql, [userId], (err, rows) => {
+    const sql = 'SELECT * FROM games WHERE user_id = ? AND tournament_id = ?';
+    db.get(sql, [userId, tournamentId], (err, row) => {
       if (err)
         reject(err);
+      else if (row === undefined)
+        resolve(null);
       else
-        resolve(rows.map(row => ({
-          gameId: row.id,
-          difficulty: row.difficulty,
-          tournamentCode: row.code
-        })));
+        resolve(new Game(row.id, row.user_id, row.tournament_id, row.difficulty, row.grid_size, row.missiles, row.status, row.created_at));
     });
   });
 };
 
-//Restituisci le statistiche di un utente in base al livello di difficoltà
-export const getStats = (userId) => {
+//Restituisci le statistiche di tutti gli utenti in base al livello di difficoltà
+export const getStats = () => {
   return new Promise((resolve, reject) => {
-   const sql = `SELECT difficulty, 
-                    COUNT(*) as played,
-                    SUM(CASE WHEN status = 'won' THEN 1 ELSE 0 END) as won,
-                    SUM(CASE WHEN status = 'lost' THEN 1 ELSE 0 END) as lost
-             FROM games 
-             WHERE user_id = ? AND status != 'ongoing'
-             GROUP BY difficulty`;
-    db.all(sql, [userId], (err, rows) => {
+    const sql = `SELECT users.id as userId, users.name,
+                        games.difficulty,
+                        COUNT(*) as played,
+                        SUM(CASE WHEN games.status = 'won' THEN 1 ELSE 0 END) as won,
+                        SUM(CASE WHEN games.status = 'lost' THEN 1 ELSE 0 END) as lost
+                 FROM games JOIN users ON games.user_id = users.id
+                 WHERE games.status != 'ongoing'
+                 GROUP BY users.id, games.difficulty`;
+    db.all(sql, [], (err, rows) => {
       if (err)
         reject(err);
       else
         resolve(rows.map(row => ({
+          userId: row.userId,
+          name: row.name,
           difficulty: row.difficulty,
           played: row.played,
           won: row.won,
@@ -103,22 +101,4 @@ export const getStats = (userId) => {
   });
 };
 
-// Elimina la partita casuale e tutti i dati relativi ad essa dopo la sua fine
-export const deleteGame = (gameId) => {
-  return new Promise((resolve, reject) => {
-    const sql1 = 'DELETE FROM shots WHERE game_id = ?';
-    const sql2 = 'DELETE FROM ships WHERE game_id = ?';
-    const sql3 = 'DELETE FROM games WHERE id = ?';
-    db.run(sql1, [gameId], (err) => {
-      if (err) reject(err);
-      else db.run(sql2, [gameId], (err) => {
-        if (err) reject(err);
-        else db.run(sql3, [gameId], function(err) {
-          if (err) reject(err);
-          else resolve(this.changes);
-        });
-      });
-    });
-  });
-};
 

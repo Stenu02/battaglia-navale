@@ -15,7 +15,7 @@ export const createTournament = (code, difficulty, gridSize) => {
   });
 };
 
-// Restituisce un torneo dato il suo id
+// Restituisce un torneo dato il suo code
 export const getTournamentByCode = (code) => {
   return new Promise((resolve, reject) => {
     const sql = 'SELECT * FROM tournaments WHERE code = ?';

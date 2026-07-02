@@ -12,7 +12,7 @@ import session from 'express-session';
 
 // Dao imports
 import { getUser} from './userDao.js';
-import { createGame, getGameById, updateGameStatus, updateMissiles, getStats, deleteGame, getOngoingGamesByUser } from './gameDao.js';
+import { createGame, getGameById, updateGameStatus, updateMissiles, getStats,getGameByUserAndTournament } from './gameDao.js';
 import { createShip, getShipsByGame, markShipAsSunk, getTournamentShips, createTournamentShip, getShipByCell } from './shipDao.js';
 import { createShot, getShotsByGame, getShotByCell, getHitsByShip } from './shotDao.js';
 import { createTournament, getTournamentByCode } from './tournamentDao.js';
@@ -148,6 +148,10 @@ app.post('/api/tournaments/:code/join', isLoggedIn, async (req, res) => {
     const tournament = await getTournamentByCode(req.params.code);
     if (!tournament)
       return res.status(404).json({ error: 'Tournament not found' });
+
+    const existingGame = await getGameByUserAndTournament(req.user.id, tournament.id);
+    if (existingGame)
+      return res.status(409).json({ error: 'You already have a game in this tournament' })
 
     const config = getGameConfig(tournament.difficulty);
 
@@ -285,10 +289,6 @@ app.post('/api/games/:id/shots', [
       await updateGameStatus(req.params.id, 'lost');
     }
 
-    //Eliminazione dati per pulizia in caso di game anonimo
-    if (!game.userId && status !== 'ongoing') {
-      await deleteGame(req.params.id);
-    }
 
     return res.status(200).json({
       result: result,
@@ -300,15 +300,7 @@ app.post('/api/games/:id/shots', [
   }
 });
 
-// GET /api/games
-app.get('/api/games', isLoggedIn, async (req, res) => {
-  try {
-    const games = await getOngoingGamesByUser(req.user.id);
-    return res.status(200).json({ games });
-  } catch (err) {
-    return res.status(500).json({ error: 'Internal server error' });
-  }
-});
+
 
 // GET /api/games/:id 
 app.get('/api/games/:id', async (req, res) => {
@@ -384,10 +376,10 @@ app.get('/api/games/:id/ships', async (req, res) => {
 });
 
 // GET /api/stats 
-app.get('/api/stats', isLoggedIn, async (req, res) => {
+app.get('/api/stats', async (req, res) => {
   try {
-    const stats = await getStats(req.user.id);
-    return res.status(200).json({ stats: stats });
+    const stats = await getStats(); // nessun parametro
+    return res.status(200).json({ stats });
   } catch (err) {
     return res.status(500).json({ error: 'Internal server error' });
   }
