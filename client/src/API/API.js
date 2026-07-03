@@ -159,17 +159,7 @@ export const getStats = async () => {
   }
 };
 
-//restituisci configurazione delle difficoltà
-export const getConfig = async () => {
-  const response = await fetch(`${SERVER_URL}/api/config`);
-  if (response.ok) {
-    const data = await response.json();
-    return data;
-  } else {
-    const errMessage = await response.json();
-    throw errMessage.error;
-  }
-};
+
 
 const API = {
   logIn,
@@ -182,7 +172,6 @@ const API = {
   getGame,
   getShips,
   getStats,
-  getConfig
 };
 
 export default API;

@@ -1,18 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState} from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button, Alert, Row, Col, Card } from 'react-bootstrap';
+import DIFFICULTIES from '../difficulties.js';
 import API from '../API/API.js';
 
-const DIFFICULTIES = [
-  { key: 'easy', label: 'Facile', variant: 'success', icon: 'bi-shield' },
-  { key: 'medium', label: 'Intermedio', variant: 'warning', icon: 'bi-lightning-charge' },
-  { key: 'hard', label: 'Difficile', variant: 'danger', icon: 'bi-fire' },
-];
+
 
 function Home() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [config, setConfig] = useState({});
   const navigate = useNavigate();
 
   const handleCasualGame = async (difficulty) => {
@@ -26,9 +22,6 @@ function Home() {
     }
   };
 
-  useEffect(() => {
-    API.getConfig().then(setConfig).catch(err => setError(err));
-  }, []);
 
   return (
     <Row className='justify-content-center mt-5'>
@@ -63,15 +56,15 @@ function Home() {
                   <ul className='list-unstyled mb-4 text-start fs-4'>
                     <li className='d-flex justify-content-between align-items-center border-bottom py-2'>
                       <span className='text-secondary'><i className='bi bi-grid-3x3 me-2'></i>Griglia</span>
-                      <strong>{config[d.key]?.gridSize}×{config[d.key]?.gridSize}</strong>
+                      <strong>{d.gridSize}×{d.gridSize}</strong>
                     </li>
                     <li className='d-flex justify-content-between align-items-center border-bottom py-2'>
                       <span className='text-secondary'><i className='bi bi-life-preserver me-2'></i>Navi</span>
-                      <strong>{config[d.key]?.shipsCount}</strong>
+                      <strong>{d.shipsCount}</strong>
                     </li>
                     <li className='d-flex justify-content-between align-items-center py-2'>
                       <span className='text-secondary'><i className='bi bi-rocket me-2'></i>Siluri</span>
-                      <strong>{config[d.key]?.missiles}</strong>
+                      <strong>{d.missiles}</strong>
                     </li>
                   </ul>
                   <Button

@@ -1,23 +1,36 @@
 import { Outlet, Link } from 'react-router-dom';
-import { Navbar, Nav, Container, Button } from 'react-bootstrap';
+import { Navbar, Container, Button } from 'react-bootstrap';
 
 function MyNavbar(props) {
   return (
     <>
-      <Navbar bg='primary' data-bs-theme='dark'>
+      <Navbar data-bs-theme='dark' style={{ backgroundColor: '#0B3D66' }} className='py-3'>
         <Container fluid>
-          <Link to='/' className='navbar-brand'>Battaglia Navale</Link>
+          <Link
+            to='/'
+            className='navbar-brand mb-0'
+            style={{ fontFamily: "'Oswald', sans-serif", fontWeight: 700, fontSize: '1.6rem', letterSpacing: '0.02em', textTransform: 'uppercase', color: '#fff' }}>
+            Battaglia Navale
+          </Link>
           {props.loggedIn ? (
-            <>
-              <Navbar.Text className='me-3'>
+            <div className='d-flex align-items-center gap-3'>
+              <Navbar.Text className='fs-5 mb-0'>
                 {props.user.name}
               </Navbar.Text>
-              <Button variant='outline-light' onClick={props.onLogout}>
+              <Button
+                variant='light'
+                size='lg'
+                className='rounded-pill px-4 fw-semibold'
+                style={{ color: '#0B3D66' }}
+                onClick={props.onLogout}>
                 Logout
               </Button>
-            </>
+            </div>
           ) : (
-            <Link to='/login' className='btn btn-outline-light'>
+            <Link
+              to='/login'
+              className='btn btn-lg btn-light rounded-pill px-4 fw-semibold'
+              style={{ color: '#0B3D66' }}>
               Login
             </Link>
           )}

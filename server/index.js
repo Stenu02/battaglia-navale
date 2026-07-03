@@ -386,22 +386,6 @@ app.get('/api/games/:id/ships', async (req, res) => {
   }
 });
 
-// GET /api/config
-app.get('/api/config', (req, res) => {
-  const difficulties = ['easy', 'medium', 'hard'];
-  const config = {};
-  difficulties.forEach(d => {
-    const c = getGameConfig(d);
-    config[d] = {
-      gridSize: c.gridSize,
-      missiles: c.missiles,
-      shipsCount: c.ships.length,
-      minShipSize: Math.min(...c.ships),
-      maxShipSize: Math.max(...c.ships)
-    };
-  });
-  return res.status(200).json(config);
-});
 
 // GET /api/stats 
 app.get('/api/stats', async (req, res) => {
