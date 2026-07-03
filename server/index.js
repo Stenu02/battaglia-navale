@@ -66,6 +66,15 @@ const isLoggedIn = (req, res, next) => {
   return res.status(401).json({error: "Not authenticated"});
 }
 
+// Tiene solo il messaggio di ciascun errore di validazione
+const errorFormatter = ({ msg }) => msg;
+
+// Risponde 422 con gli errori mappati per campo: { validationErrors: { campo: "msg" } }
+const onValidationErrors = (result, res) => {
+  const errors = result.formatWith(errorFormatter);
+  return res.status(422).json({ validationErrors: errors.mapped() });
+};
+
 /* ROUTES */
 
 // POST /api/sessions 
@@ -96,7 +105,7 @@ app.post('/api/tournaments', isLoggedIn, [
 ], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty())
-    return res.status(422).json({ errors: errors.array() });
+    return onValidationErrors(errors, res);
 
   try {
     // Configurazione in base alla difficoltà
@@ -187,7 +196,7 @@ app.post('/api/games', [
 
   const errors = validationResult(req);
   if (!errors.isEmpty())
-    return res.status(422).json({ errors: errors.array() });
+    return onValidationErrors(errors, res);
 
   try {
     // Configurazione sulla base della difficoltà
@@ -222,7 +231,7 @@ app.post('/api/games/:id/shots', [
 ], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty())
-    return res.status(422).json({ errors: errors.array() });
+    return onValidationErrors(errors, res);
 
   try {
     
@@ -331,6 +340,8 @@ app.get('/api/games/:id', async (req, res) => {
       gameId: game.id,
       status: game.status,
       missiles: game.missiles,
+      gridSize: game.gridSize,      
+      ships: ships.map(s => s.size),
       shots: shots.map(shot => ({ row: shot.row, col: shot.col, result: shot.result })),
       sunkenShips: sunkenShips
     });
@@ -373,6 +384,23 @@ app.get('/api/games/:id/ships', async (req, res) => {
   } catch (err) {
     return res.status(500).json({ error: 'Internal server error' });
   }
+});
+
+// GET /api/config
+app.get('/api/config', (req, res) => {
+  const difficulties = ['easy', 'medium', 'hard'];
+  const config = {};
+  difficulties.forEach(d => {
+    const c = getGameConfig(d);
+    config[d] = {
+      gridSize: c.gridSize,
+      missiles: c.missiles,
+      shipsCount: c.ships.length,
+      minShipSize: Math.min(...c.ships),
+      maxShipSize: Math.max(...c.ships)
+    };
+  });
+  return res.status(200).json(config);
 });
 
 // GET /api/stats 
