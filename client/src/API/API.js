@@ -1,4 +1,3 @@
-import Ship from '../ship.js';
 
 const SERVER_URL = 'http://localhost:3001';
 
@@ -56,10 +55,7 @@ export const createTournament = async (difficulty) => {
     return data;
   } else {
     const errMessage = await response.json();
-    if (response.status === 422)
-      throw errMessage.errors[0].msg;
-    else
-      throw errMessage.error;
+    throw errMessage.error;
   }
 };
 
@@ -90,10 +86,7 @@ export const createCasualGame = async (difficulty) => {
     return data;
   } else {
     const errMessage = await response.json();
-    if (response.status === 422)
-      throw errMessage.errors[0].msg;
-    else
-      throw errMessage.error;
+    throw errMessage.error;
   }
 };
 
@@ -108,12 +101,9 @@ export const fireShot = async (gameId, row, col) => {
   if (response.ok) {
     const data = await response.json();
     return data;
-  } else {
+   } else {
     const errMessage = await response.json();
-    if (response.status === 422)
-      throw errMessage.errors ? errMessage.errors[0].msg : errMessage.error;
-    else
-      throw errMessage.error;
+    throw errMessage.error;
   }
 };
 
@@ -140,7 +130,7 @@ export const getShips = async (gameId) => {
   });
   if (response.ok) {
     const data = await response.json();
-    return data.ships.map(s => new Ship(s.size, s.row, s.col, s.direction, s.sunk));
+    return data.ships;
   } else {
     const errMessage = await response.json();
     throw errMessage.error;
@@ -153,6 +143,17 @@ export const getStats = async () => {
   if (response.ok) {
     const data = await response.json();
     return data.stats;
+  } else {
+    const errMessage = await response.json();
+    throw errMessage.error;
+  }
+};
+
+// recupera la configurazione di gioco delle difficoltà
+export const getConfig = async () => {
+  const response = await fetch(`${SERVER_URL}/api/config`);
+  if (response.ok) {
+    return await response.json();
   } else {
     const errMessage = await response.json();
     throw errMessage.error;
@@ -172,6 +173,7 @@ const API = {
   getGame,
   getShips,
   getStats,
+  getConfig,
 };
 
 export default API;

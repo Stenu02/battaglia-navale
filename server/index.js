@@ -3,7 +3,7 @@ import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
 import { check, validationResult } from 'express-validator';
-import { getGameConfig, generateCode, generateShips } from './gameUtils.js';
+import { getGameConfig, generateCode, generateShips, DIFFICULTY_KEYS } from './gameUtils.js';
 
 // Passport imports
 import passport from 'passport';
@@ -40,7 +40,7 @@ app.use(cors(corsOptions));
 passport.use(new LocalStrategy(async function verify(username, password, cb) {
   const user = await getUser(username, password);
   if (!user)
-    return cb(null, false, 'Incorrect username or password.');
+    return cb(null, false, 'Username o password errati');
   return cb(null, user);
 }));
 
@@ -63,16 +63,17 @@ const isLoggedIn = (req, res, next) => {
   if (req.isAuthenticated()) {
     return next();
   }
-  return res.status(401).json({ error: "Not authenticated" });
+  return res.status(401).json({ error: "Non autenticato" });
 }
 
 // Tiene solo il messaggio di ciascun errore di validazione
 const errorFormatter = ({ msg }) => msg;
 
-// Risponde 422 con gli errori mappati per campo: { validationErrors: { campo: "msg" } }
+// Risponde 422 con un unico messaggio d'errore: { error: "msg1, msg2, ..." }
 const onValidationErrors = (result, res) => {
-  const errors = result.formatWith(errorFormatter);
-  return res.status(422).json({ validationErrors: errors.mapped() });
+  const errors = result.formatWith(errorFormatter);            // errorFormatter -> stringa msg
+  const message = Object.values(errors.mapped()).join(', ');   // unisce i messaggi dei campi
+  return res.status(422).json({ error: message });             // stessa forma di tutti gli altri errori
 };
 
 /* ROUTES */
@@ -89,7 +90,7 @@ app.get("/api/sessions/current", (req, res) => {
     res.json(req.user);
   }
   else
-    res.status(401).json({ error: "Not authenticated" });
+    res.status(401).json({ error: "Non autenticato" });
 });
 
 // DELETE /api/sessions/current - Logout
@@ -146,7 +147,7 @@ app.post('/api/tournaments', isLoggedIn, [
       missiles: config.missiles
     });
   } catch (err) {
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Errore interno del server' });
   }
 });
 
@@ -157,11 +158,11 @@ app.post('/api/tournaments/:code/join', isLoggedIn, async (req, res) => {
     // Verifichiamo che il codice è associato ad un torneo
     const tournament = await getTournamentByCode(req.params.code);
     if (!tournament)
-      return res.status(404).json({ error: 'Tournament not found' });
+      return res.status(404).json({ error: 'Torneo non trovato' });
 
     const existingGame = await getGameByUserAndTournament(req.user.id, tournament.id);
     if (existingGame)
-      return res.status(409).json({ error: 'You already have a game in this tournament' })
+      return res.status(409).json({ error: 'Hai già una partita in questo torneo' })
 
     const config = getGameConfig(tournament.difficulty);
 
@@ -183,7 +184,7 @@ app.post('/api/tournaments/:code/join', isLoggedIn, async (req, res) => {
       missiles: config.missiles
     });
   } catch (err) {
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Errore interno del server' });
   }
 });
 
@@ -193,7 +194,7 @@ app.post('/api/games', [
 ], async (req, res) => {
   // Controllo utenti anonimi
   if (req.isAuthenticated())
-    return res.status(403).json({ error: 'Authenticated users cannot play casual mode' });
+    return res.status(403).json({ error: 'Gli utenti autenticati non possono giocare una partita casuale' });
 
   const errors = validationResult(req);
   if (!errors.isEmpty())
@@ -221,7 +222,7 @@ app.post('/api/games', [
       missiles: config.missiles
     });
   } catch (err) {
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Errore interno del server' });
   }
 });
 
@@ -238,28 +239,28 @@ app.post('/api/games/:id/shots', [
 
     const game = await getGameById(req.params.id);
     if (!game)
-      return res.status(404).json({ error: 'Game not found' });
+      return res.status(404).json({ error: 'Partita non trovata' });
 
 
     if (game.status !== 'ongoing')
-      return res.status(403).json({ error: 'Game already ended' });
+      return res.status(403).json({ error: 'Partita già conclusa' });
 
 
     if (game.userId && !req.isAuthenticated())
-      return res.status(401).json({ error: 'Not authenticated' });
+      return res.status(401).json({ error: 'Non autenticato' });
 
 
     if (game.userId && game.userId !== req.user.id)
-      return res.status(403).json({ error: 'Not authorized' });
+      return res.status(403).json({ error: 'Non autorizzato' });
 
     // Controllo validità coordinate
     if (req.body.row > game.gridSize || req.body.col > game.gridSize)
-      return res.status(422).json({ error: 'Invalid coordinates' });
+      return res.status(422).json({ error: 'Coordinate non valide' });
 
     // Controllo cella già colpita
     const existingShot = await getShotByCell(req.params.id, req.body.row, req.body.col);
     if (existingShot)
-      return res.status(409).json({ error: 'Cell already fired upon' });
+      return res.status(409).json({ error: 'Cella già colpita' });
 
     // Controllo se una nave viene colpita
     const hitShip = await getShipByCell(req.params.id, req.body.row, req.body.col);
@@ -312,7 +313,7 @@ app.post('/api/games/:id/shots', [
       sunkShipCells: sunkShipCells
     });
   } catch (err) {
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Errore interno del server' });
   }
 });
 
@@ -324,15 +325,15 @@ app.get('/api/games/:id', async (req, res) => {
 
     const game = await getGameById(req.params.id);
     if (!game)
-      return res.status(404).json({ error: 'Game not found' });
+      return res.status(404).json({ error: 'Partita non trovata' });
 
 
     if (game.userId && !req.isAuthenticated())
-      return res.status(401).json({ error: 'Not authenticated' });
+      return res.status(401).json({ error: 'Non autenticato' });
 
 
     if (game.userId && game.userId !== req.user.id)
-      return res.status(403).json({ error: 'Not authorized' });
+      return res.status(403).json({ error: 'Non autorizzato' });
 
 
     const shots = await getShotsByGame(req.params.id);
@@ -354,7 +355,7 @@ app.get('/api/games/:id', async (req, res) => {
       sunkenShips: sunkenShips
     });
   } catch (err) {
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Errore interno del server' });
   }
 });
 
@@ -364,19 +365,19 @@ app.get('/api/games/:id/ships', async (req, res) => {
 
     const game = await getGameById(req.params.id);
     if (!game)
-      return res.status(404).json({ error: 'Game not found' });
+      return res.status(404).json({ error: 'Partita non trovata' });
 
 
     if (game.userId && !req.isAuthenticated())
-      return res.status(401).json({ error: 'Not authenticated' });
+      return res.status(401).json({ error: 'Non autenticato' });
 
 
     if (game.userId && game.userId !== req.user.id)
-      return res.status(403).json({ error: 'Not authorized' });
+      return res.status(403).json({ error: 'Non autorizzato' });
 
     // Controllo sullo stato della partita
     if (game.status === 'ongoing')
-      return res.status(403).json({ error: 'Game still ongoing' });
+      return res.status(403).json({ error: 'Partita ancora in corso' });
 
     const ships = await getShipsByGame(req.params.id);
 
@@ -390,7 +391,7 @@ app.get('/api/games/:id/ships', async (req, res) => {
       }))
     });
   } catch (err) {
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Errore interno del server' });
   }
 });
 
@@ -398,11 +399,20 @@ app.get('/api/games/:id/ships', async (req, res) => {
 // GET /api/stats 
 app.get('/api/stats', async (req, res) => {
   try {
-    const stats = await getStats(); // nessun parametro
+    const stats = await getStats(); 
     return res.status(200).json({ stats });
   } catch (err) {
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Errore interno del server' });
   }
+});
+
+// GET /api/config - configurazione di gioco delle difficoltà 
+app.get('/api/config', (req, res) => {
+  const config = DIFFICULTY_KEYS.map(key => {
+    const c = getGameConfig(key);
+    return { key, gridSize: c.gridSize, missiles: c.missiles, shipsCount: c.ships.length, shipSizes: c.ships };
+  });
+  return res.status(200).json(config);
 });
 
 

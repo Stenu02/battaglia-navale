@@ -16,7 +16,7 @@ function Dashboard(props) {
 
         <Row className='g-4 mb-5'>
           <Col md={6}>
-            <CreateTournament />
+            <CreateTournament config={props.config} />
           </Col>
           <Col md={6}>
             <JoinTournament />

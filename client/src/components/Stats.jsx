@@ -80,13 +80,13 @@ function Stats(props) {
                       {players.map((p, i) => {
                         const isMe = props.loggedIn && p.userId === props.user.id;
                         return (
-                          <tr key={p.userId} className={isMe ? 'table-primary' : 'border-top'}>
+                          <tr key={p.userId} className='border-top'>
                             <td className='py-3'>
                               {i === 0 && <i className='bi bi-trophy-fill text-warning'></i>}
                             </td>
                             <td className='fw-medium py-3'>
                               {p.name}
-                              {isMe && <span className='badge bg-primary ms-2'>Tu — {i + 1}° posto</span>}
+                              {isMe && <span className='badge bg-primary ms-2'>Tu</span>}
                             </td>
                             <td className='text-center py-3'>{p.played}</td>
                             <td className='text-center py-3'>{p.won}</td>

@@ -1,4 +1,4 @@
-import { useState} from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button, Alert, Row, Col, Card } from 'react-bootstrap';
 import DIFFICULTIES from '../difficulties.js';
@@ -6,7 +6,7 @@ import API from '../API/API.js';
 
 
 
-function Home() {
+function Home(props) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -39,46 +39,48 @@ function Home() {
         </p>
 
         {error && <Alert variant='danger'>{error}</Alert>}
-
         <Row className='g-5 mb-5'>
-          {DIFFICULTIES.map(d => (
-            <Col lg={4} key={d.key}>
-              <Card className={`h-100 border-2 border-${d.variant}`}>
-                <Card.Body className='d-flex flex-column p-5'>
-                  <div className='d-flex align-items-center gap-3 mb-4'>
-                    <span
-                      className={`d-inline-flex align-items-center justify-content-center rounded-circle bg-${d.variant}-subtle text-${d.variant}-emphasis fs-2`}
-                      style={{ width: 68, height: 68, flexShrink: 0 }}>
-                      <i className={`bi ${d.icon}`}></i>
-                    </span>
-                    <span className='fs-2 fw-semibold'>{d.label}</span>
-                  </div>
-                  <ul className='list-unstyled mb-4 text-start fs-4'>
-                    <li className='d-flex justify-content-between align-items-center border-bottom py-2'>
-                      <span className='text-secondary'><i className='bi bi-grid-3x3 me-2'></i>Griglia</span>
-                      <strong>{d.gridSize}×{d.gridSize}</strong>
-                    </li>
-                    <li className='d-flex justify-content-between align-items-center border-bottom py-2'>
-                      <span className='text-secondary'><i className='bi bi-life-preserver me-2'></i>Navi</span>
-                      <strong>{d.shipsCount}</strong>
-                    </li>
-                    <li className='d-flex justify-content-between align-items-center py-2'>
-                      <span className='text-secondary'><i className='bi bi-rocket me-2'></i>Siluri</span>
-                      <strong>{d.missiles}</strong>
-                    </li>
-                  </ul>
-                  <Button
-                    variant={`outline-${d.variant}`}
-                    className={`w-100 mt-auto bg-${d.variant}-subtle text-${d.variant}-emphasis fw-semibold py-3 fs-4`}
-                    size='lg'
-                    disabled={loading}
-                    onClick={() => handleCasualGame(d.key)}>
-                    Gioca
-                  </Button>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
+          {DIFFICULTIES.map(d => {
+            const info = props.config[d.key];
+            return (
+              <Col lg={4} key={d.key}>
+                <Card className={`h-100 border-2 border-${d.variant}`}>
+                  <Card.Body className='d-flex flex-column p-5'>
+                    <div className='d-flex align-items-center gap-3 mb-4'>
+                      <span
+                        className={`d-inline-flex align-items-center justify-content-center rounded-circle bg-${d.variant}-subtle text-${d.variant}-emphasis fs-2`}
+                        style={{ width: 68, height: 68, flexShrink: 0 }}>
+                        <i className={`bi ${d.icon}`}></i>
+                      </span>
+                      <span className='fs-2 fw-semibold'>{d.label}</span>
+                    </div>
+                    <ul className='list-unstyled mb-4 text-start fs-4'>
+                      <li className='d-flex justify-content-between align-items-center border-bottom py-2'>
+                        <span className='text-secondary'><i className='bi bi-grid-3x3 me-2'></i>Griglia</span>
+                        <strong>{info?.gridSize}×{info?.gridSize}</strong>
+                      </li>
+                      <li className='d-flex justify-content-between align-items-center border-bottom py-2'>
+                        <span className='text-secondary'><i className='bi bi-life-preserver me-2'></i>Navi</span>
+                        <strong>{info?.shipsCount}</strong>
+                      </li>
+                      <li className='d-flex justify-content-between align-items-center py-2'>
+                        <span className='text-secondary'><i className='bi bi-rocket me-2'></i>Siluri</span>
+                        <strong>{info?.missiles}</strong>
+                      </li>
+                    </ul>
+                    <Button
+                      variant={`outline-${d.variant}`}
+                      className={`w-100 mt-auto bg-${d.variant}-subtle text-${d.variant}-emphasis fw-semibold py-3 fs-4`}
+                      size='lg'
+                      disabled={loading}
+                      onClick={() => handleCasualGame(d.key)}>
+                      Gioca
+                    </Button>
+                  </Card.Body>
+                </Card>
+              </Col>
+            );
+          })}
         </Row>
 
         <div className='text-center pt-5 border-top' style={{ marginTop: '6rem' }}>

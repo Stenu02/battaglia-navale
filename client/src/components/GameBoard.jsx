@@ -4,9 +4,9 @@ import { Row, Col, Alert, Button, ProgressBar, Card } from 'react-bootstrap';
 import Grid from './Grid.jsx';
 import ShipIndicator from './ShipIndicator.jsx';
 import API from '../API/API.js';
-import DIFFICULTIES from '../difficulties.js';
 
-function GameBoard() {
+
+function GameBoard(props) {
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -60,8 +60,7 @@ function GameBoard() {
     }
   };
 
-  const difficultyInfo = DIFFICULTIES.find(d => d.key === game.difficulty);
-  const maxMissiles = difficultyInfo?.missiles || 1;
+  const maxMissiles = props.config[game.difficulty]?.missiles || 1;
 
   let statusMessage;
   if (game.status === 'won') {

@@ -1,3 +1,4 @@
+export const DIFFICULTY_KEYS = ['easy', 'medium', 'hard'];
 
 export const getGameConfig = (difficulty) => {
   switch (difficulty) {

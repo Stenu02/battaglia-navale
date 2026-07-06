@@ -26,7 +26,7 @@ export const getGameById = (id) => {
       else if (row === undefined)
         resolve(null);
       else
-        resolve(new Game(row.id, row.user_id, row.tournament_id, row.difficulty, row.grid_size, row.missiles, row.status, row.created_at));
+        resolve(new Game(row.id, row.user_id, row.tournament_id, row.difficulty, row.grid_size, row.missiles, row.status));
     });
   });
 };
@@ -68,7 +68,7 @@ export const getGameByUserAndTournament = (userId, tournamentId) => {
       else if (row === undefined)
         resolve(null);
       else
-        resolve(new Game(row.id, row.user_id, row.tournament_id, row.difficulty, row.grid_size, row.missiles, row.status, row.created_at));
+        resolve(new Game(row.id, row.user_id, row.tournament_id, row.difficulty, row.grid_size, row.missiles, row.status));
     });
   });
 };

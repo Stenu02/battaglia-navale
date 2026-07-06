@@ -18,6 +18,7 @@ function App() {
   const [user, setUser] = useState({});
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
+  const [config, setConfig] = useState({});
 
   const navigate = useNavigate();
 
@@ -34,6 +35,19 @@ function App() {
       }
     };
     checkAuth();
+  }, []);
+
+  useEffect(() => {
+    const loadConfig = async () => {
+      try {
+        const cfg = await API.getConfig();
+        setConfig(Object.fromEntries(cfg.map(c => [c.key, c])));
+      } catch (e) {
+        // anomalia reale, ma cosmetica: i componenti usano i fallback (?.).
+        console.error('Configurazione non disponibile:', e);
+      }
+    };
+    loadConfig();
   }, []);
 
   const handleLogin = async (credentials) => {
@@ -62,27 +76,18 @@ function App() {
     <Routes>
       <Route element={<MyNavbar loggedIn={loggedIn} user={user} onLogout={handleLogout} />}>
 
-        <Route path='/'
-          element={loggedIn ? <Navigate replace to='/dashboard' /> : <Home />}
-        />
+        <Route path='/' element={loggedIn ? <Navigate replace to='/dashboard' /> : <Home config={config} />} />
 
-        <Route path='/login'
-          element={loggedIn ? <Navigate replace to='/dashboard' /> : <Login onLogin={handleLogin} message={message} />}
-        />
+        <Route path='/login' element={loggedIn ? <Navigate replace to='/dashboard' /> : <Login onLogin={handleLogin} message={message} />} />
 
-        <Route path='/dashboard'
-          element={loggedIn ? <Dashboard user={user} /> : <Navigate replace to='/login' />}
-        />
+        <Route path='/dashboard' element={loggedIn ? <Dashboard user={user} config={config} /> : <Navigate replace to='/login' />} />
 
-        <Route path='/game/:id'
-          element={<GameBoard />}
-        />
+        <Route path='/game/:id' element={<GameBoard config={config} />} />
 
-        <Route path='/stats'
-          element={<Stats user={user} loggedIn={loggedIn} />}
-        />
+        <Route path='/stats' element={<Stats user={user} loggedIn={loggedIn} />} />
 
         <Route path='*' element={<NotFound />} />
+
       </Route>
     </Routes>
   );

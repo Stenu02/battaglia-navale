@@ -153,7 +153,7 @@ content-type: application/json
 ###
 
 ## Lancia un missile con coordinate non valide (422)
-POST http://localhost:3001/api/games/11/shots HTTP/1.1
+POST http://localhost:3001/api/games/ID/shots HTTP/1.1
 content-type: application/json
 
 {
@@ -198,12 +198,15 @@ GET http://localhost:3001/api/games/ID/ships HTTP/1.1
 
 ### ==================== STATS ====================
 
-## Recupera le statistiche dell'utente (richiede login)
+## Recupera le statistiche globali (pubblico, 200)
 GET http://localhost:3001/api/stats HTTP/1.1
 
 ###
 
-## Recupera le statistiche senza essere autenticato (401)
-GET http://localhost:3001/api/stats HTTP/1.1
+
+### ==================== CONFIG ====================
+
+## Recupera la configurazione delle difficoltà (pubblico, 200)
+GET http://localhost:3001/api/config HTTP/1.1
 
 ###

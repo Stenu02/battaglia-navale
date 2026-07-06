@@ -4,7 +4,7 @@ import { Button, Form, Modal, Alert, Card } from 'react-bootstrap';
 import API from '../API/API.js';
 import DIFFICULTIES from '../difficulties.js';
 
-function CreateTournament() {
+function CreateTournament(props) {
   const [difficulty, setDifficulty] = useState('easy');
   const [showModal, setShowModal] = useState(false);
   const [tournamentData, setTournamentData] = useState({});
@@ -12,7 +12,7 @@ function CreateTournament() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const selected = DIFFICULTIES.find(d => d.key === difficulty);
+  const selected = props.config[difficulty];
 
   const handleCreate = async () => {
     setLoading(true);
@@ -59,9 +59,9 @@ function CreateTournament() {
         </Form.Group>
 
         <div className='d-flex justify-content-between bg-body-tertiary rounded-3 px-3 py-2 mb-4'>
-          <span><i className='bi bi-grid-3x3 me-1'></i>{selected.gridSize}×{selected.gridSize}</span>
-          <span><i className='bi bi-life-preserver me-1'></i>{selected.shipsCount} navi</span>
-          <span><i className='bi bi-rocket me-1'></i>{selected.missiles} siluri</span>
+          <span><i className='bi bi-grid-3x3 me-1'></i>{selected?.gridSize}×{selected?.gridSize}</span>
+          <span><i className='bi bi-life-preserver me-1'></i>{selected?.shipsCount} navi</span>
+          <span><i className='bi bi-rocket me-1'></i>{selected?.missiles} siluri</span>
         </div>
 
         <Button

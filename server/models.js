@@ -1,6 +1,4 @@
-import dayjs from 'dayjs';
-
-function Game(id, userId, tournamentId, difficulty, gridSize, missiles, status, createdAt) {
+function Game(id, userId, tournamentId, difficulty, gridSize, missiles, status) {
   this.id = id;
   this.userId = userId;
   this.tournamentId = tournamentId;
@@ -8,7 +6,6 @@ function Game(id, userId, tournamentId, difficulty, gridSize, missiles, status, 
   this.gridSize = gridSize;
   this.missiles = missiles;
   this.status = status;
-  this.createdAt = dayjs(createdAt);
 }
 
 function Ship(gameId, size, row, col, direction, sunk) {

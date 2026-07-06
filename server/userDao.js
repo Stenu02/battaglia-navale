@@ -1,6 +1,7 @@
 import db from './db.js';
 import crypto from 'crypto';
 
+//ritorna l'utente che rispetta username e password
 export const getUser = (username, password) => {
   return new Promise((resolve, reject) => {
     const sql = 'SELECT * FROM users WHERE username = ?';
@@ -18,21 +19,6 @@ export const getUser = (username, password) => {
           else
             resolve(user);
         });
-      }
-    });
-  });
-};
-
-export const getUserById = (id) => {
-  return new Promise((resolve, reject) => {
-    const sql = 'SELECT id, username, name FROM users WHERE id = ?';
-    db.get(sql, [id], (err, row) => {
-      if (err) {
-        reject(err);
-      } else if (row === undefined) {
-        resolve(null);
-      } else {
-        resolve(row);
       }
     });
   });
