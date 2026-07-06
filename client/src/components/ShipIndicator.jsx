@@ -1,24 +1,30 @@
-
 function ShipIndicator(props) {
+  const remaining = props.sunkShips.map(s => s.size);
+  const isSunk = props.ships.map(size => {
+    const idx = remaining.indexOf(size);
+    if (idx !== -1) {
+      remaining.splice(idx, 1);
+      return true;
+    }
+    return false;
+  });
+
   return (
-    <div className='d-flex flex-wrap gap-2 mb-3'>
+    <div className='d-flex flex-wrap gap-2'>
       {props.ships.map((size, index) => (
-        <div
+        <span
           key={index}
-          className='d-flex gap-1'
-          title={`Nave da ${size}`}>
-          {Array.from({ length: size }, (_, i) => (
-            <div
-              key={i}
-              style={{
-                width: '20px',
-                height: '20px',
-                backgroundColor: index < props.sunkenCount ? '#aaa' : '#333',
-                border: '1px solid #666'
-              }}
-            />
-          ))}
-        </div>
+          title={`Nave da ${size}${isSunk[index] ? ' - affondata' : ''}`}
+          className={`d-inline-flex align-items-center justify-content-center rounded-3 fw-semibold ${isSunk[index] ? 'bg-body-tertiary text-muted text-decoration-line-through' : 'text-white'}`}
+          style={{
+            width: 55,
+            height: 55,
+            fontSize: '22px',
+            backgroundColor: isSunk[index] ? undefined : '#0B3D66',
+            border: isSunk[index] ? '2px solid var(--bs-border-color)' : 'none'
+          }}>
+          {size}
+        </span>
       ))}
     </div>
   );

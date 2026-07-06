@@ -11,8 +11,8 @@ import LocalStrategy from 'passport-local';
 import session from 'express-session';
 
 // Dao imports
-import { getUser} from './userDao.js';
-import { createGame, getGameById, updateGameStatus, updateMissiles, getStats,getGameByUserAndTournament } from './gameDao.js';
+import { getUser } from './userDao.js';
+import { createGame, getGameById, updateGameStatus, updateMissiles, getStats, getGameByUserAndTournament } from './gameDao.js';
 import { createShip, getShipsByGame, markShipAsSunk, getTournamentShips, createTournamentShip, getShipByCell } from './shipDao.js';
 import { createShot, getShotsByGame, getShotByCell, getHitsByShip } from './shotDao.js';
 import { createTournament, getTournamentByCode } from './tournamentDao.js';
@@ -44,11 +44,11 @@ passport.use(new LocalStrategy(async function verify(username, password, cb) {
   return cb(null, user);
 }));
 
-passport.serializeUser(function(user, cb) {
+passport.serializeUser(function (user, cb) {
   cb(null, user);
 });
 
-passport.deserializeUser(function(user, cb) {
+passport.deserializeUser(function (user, cb) {
   return cb(null, user);
 });
 
@@ -60,10 +60,10 @@ app.use(session({
 app.use(passport.authenticate("session"));
 
 const isLoggedIn = (req, res, next) => {
-  if(req.isAuthenticated()) {
+  if (req.isAuthenticated()) {
     return next();
   }
-  return res.status(401).json({error: "Not authenticated"});
+  return res.status(401).json({ error: "Not authenticated" });
 }
 
 // Tiene solo il messaggio di ciascun errore di validazione
@@ -85,10 +85,11 @@ app.post('/api/sessions', passport.authenticate('local'), (req, res) => {
 
 // GET /api/sessions/current
 app.get("/api/sessions/current", (req, res) => {
-  if(req.isAuthenticated()) {
-    res.json(req.user);}
+  if (req.isAuthenticated()) {
+    res.json(req.user);
+  }
   else
-    res.status(401).json({error: "Not authenticated"});
+    res.status(401).json({ error: "Not authenticated" });
 });
 
 // DELETE /api/sessions/current - Logout
@@ -170,7 +171,7 @@ app.post('/api/tournaments/:code/join', isLoggedIn, async (req, res) => {
     // Creiamo un nuovo game
     const gameId = await createGame(req.user.id, tournament.id, tournament.difficulty, tournament.gridSize, config.missiles);
 
-   
+
     for (const ship of tournamentShips) {
       await createShip(gameId, ship.size, ship.row, ship.col, ship.direction);
     }
@@ -205,7 +206,7 @@ app.post('/api/games', [
     // Posizionamento navi random
     const ships = generateShips(config.gridSize, config.ships);
 
-    
+
     const gameId = await createGame(null, null, req.body.difficulty, config.gridSize, config.missiles);
 
 
@@ -234,12 +235,12 @@ app.post('/api/games/:id/shots', [
     return onValidationErrors(errors, res);
 
   try {
-    
+
     const game = await getGameById(req.params.id);
     if (!game)
       return res.status(404).json({ error: 'Game not found' });
 
- 
+
     if (game.status !== 'ongoing')
       return res.status(403).json({ error: 'Game already ended' });
 
@@ -247,7 +248,7 @@ app.post('/api/games/:id/shots', [
     if (game.userId && !req.isAuthenticated())
       return res.status(401).json({ error: 'Not authenticated' });
 
-  
+
     if (game.userId && game.userId !== req.user.id)
       return res.status(403).json({ error: 'Not authorized' });
 
@@ -264,12 +265,17 @@ app.post('/api/games/:id/shots', [
     const hitShip = await getShipByCell(req.params.id, req.body.row, req.body.col);
     let result = 'water';
     let newMissiles = game.missiles;
+    let sunkShipCells = null;
 
     if (hitShip) {
       const hits = await getHitsByShip(req.params.id, hitShip.row, hitShip.col, hitShip.size, hitShip.direction);
       if (hits + 1 === hitShip.size) {
         result = 'sunk';
         await markShipAsSunk(req.params.id, hitShip.row, hitShip.col);
+        sunkShipCells = Array.from({ length: hitShip.size }, (_, i) => ({
+          row: hitShip.direction === 'H' ? hitShip.row : hitShip.row + i,
+          col: hitShip.direction === 'H' ? hitShip.col + i : hitShip.col
+        }));
       } else {
         result = 'hit';
       }
@@ -302,7 +308,8 @@ app.post('/api/games/:id/shots', [
     return res.status(200).json({
       result: result,
       missiles: newMissiles,
-      status: status
+      status: status,
+      sunkShipCells: sunkShipCells
     });
   } catch (err) {
     return res.status(500).json({ error: 'Internal server error' });
@@ -314,12 +321,12 @@ app.post('/api/games/:id/shots', [
 // GET /api/games/:id 
 app.get('/api/games/:id', async (req, res) => {
   try {
- 
+
     const game = await getGameById(req.params.id);
     if (!game)
       return res.status(404).json({ error: 'Game not found' });
 
-  
+
     if (game.userId && !req.isAuthenticated())
       return res.status(401).json({ error: 'Not authenticated' });
 
@@ -339,8 +346,9 @@ app.get('/api/games/:id', async (req, res) => {
     return res.status(200).json({
       gameId: game.id,
       status: game.status,
+      difficulty: game.difficulty,
       missiles: game.missiles,
-      gridSize: game.gridSize,      
+      gridSize: game.gridSize,
       ships: ships.map(s => s.size),
       shots: shots.map(shot => ({ row: shot.row, col: shot.col, result: shot.result })),
       sunkenShips: sunkenShips
@@ -353,7 +361,7 @@ app.get('/api/games/:id', async (req, res) => {
 // GET /api/games/:id/ships 
 app.get('/api/games/:id/ships', async (req, res) => {
   try {
-  
+
     const game = await getGameById(req.params.id);
     if (!game)
       return res.status(404).json({ error: 'Game not found' });

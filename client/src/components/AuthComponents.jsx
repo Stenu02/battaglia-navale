@@ -14,30 +14,36 @@ function Login(props) {
 
   return (
     <Row className='justify-content-center mt-5'>
-      <Col md={4}>
-        <h2>Login</h2>
-        {props.message && <Alert variant='danger'>{props.message}</Alert>}
+      <Col md={5}>
+        <h1
+          className='display-4 mb-4'
+          style={{ fontFamily: "'Oswald', sans-serif", fontWeight: 700 }}>
+          Login
+        </h1>
+        {props.message && <Alert variant='danger' className='fs-5'>{props.message}</Alert>}
         <Form onSubmit={handleSubmit}>
-          <Form.Group controlId='username' className='mb-3'>
-            <Form.Label>Username</Form.Label>
+          <Form.Group controlId='username' className='mb-4'>
+            <Form.Label className='fs-5'>Username</Form.Label>
             <Form.Control
+              size='lg'
               type='email'
               name='username'
               required
               value={username}
               onChange={ev => setUsername(ev.target.value)} />
           </Form.Group>
-          <Form.Group controlId='password' className='mb-3'>
-            <Form.Label>Password</Form.Label>
+          <Form.Group controlId='password' className='mb-4'>
+            <Form.Label className='fs-5'>Password</Form.Label>
             <Form.Control
+              size='lg'
               type='password'
               name='password'
               required
               value={password}
               onChange={ev => setPassword(ev.target.value)} />
           </Form.Group>
-          <Button type='submit' variant='primary'>Login</Button>
-          <Link className='btn btn-danger mx-2' to='/'>Annulla</Link>
+          <Button type='submit' variant='primary' size='lg'>Login</Button>
+          <Link className='btn btn-danger btn-lg mx-2' to='/'>Annulla</Link>
         </Form>
       </Col>
     </Row>

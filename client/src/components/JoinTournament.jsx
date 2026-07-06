@@ -10,8 +10,7 @@ function JoinTournament() {
   const navigate = useNavigate();
 
   const handleJoin = async () => {
-    // Validazione React
-    if(code.trim() === '') {
+    if (code.trim() === '') {
       setError('Inserisci un codice torneo');
       return;
     }
@@ -19,27 +18,40 @@ function JoinTournament() {
     try {
       const data = await API.joinTournament(code.trim());
       navigate(`/game/${data.gameId}`);
-    } catch(err) {
+    } catch (err) {
       setError(err);
       setLoading(false);
     }
   };
 
   return (
-    <Card>
-      <Card.Header>Unisciti a un Torneo</Card.Header>
-      <Card.Body>
+    <Card className='h-100'>
+      <Card.Body className='d-flex flex-column p-4'>
+        <div className='d-flex align-items-center gap-3 mb-4'>
+          <span
+            className='d-inline-flex align-items-center justify-content-center rounded-circle bg-primary-subtle text-primary-emphasis fs-3'
+            style={{ width: 56, height: 56, flexShrink: 0 }}>
+            <i className='bi bi-key-fill'></i>
+          </span>
+          <span className='fs-3 fw-semibold'>Unisciti a un torneo</span>
+        </div>
+
         {error && <Alert variant='danger'>{error}</Alert>}
-        <Form.Group className='mb-3'>
-          <Form.Label>Codice Torneo</Form.Label>
+
+        <Form.Group className='mb-4'>
+          <Form.Label className='fs-5'>Codice torneo</Form.Label>
           <Form.Control
+            size='lg'
             type='text'
             placeholder='Es. ALFA42'
             value={code}
             onChange={ev => setCode(ev.target.value.toUpperCase())} />
         </Form.Group>
+
         <Button
-          variant='success'
+          variant='primary'
+          size='lg'
+          className='mt-auto'
           disabled={loading}
           onClick={handleJoin}>
           Unisciti

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 
 import MyNavbar from './components/MyNavbar.jsx';
@@ -18,21 +18,23 @@ function App() {
   const [user, setUser] = useState({});
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
-  
-useEffect(() => {
-  const checkAuth = async () => {
-    try {
-      const user = await API.getUserInfo();
-      setLoggedIn(true);
-      setUser(user);
-    } catch { 
-       // nessuna sessione attiva all'avvio
-    } finally {
-      setLoading(false);
-    }
-  };
-  checkAuth();
-}, []);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const user = await API.getUserInfo();
+        setLoggedIn(true);
+        setUser(user);
+      } catch {
+        // nessuna sessione attiva all'avvio
+      } finally {
+        setLoading(false);
+      }
+    };
+    checkAuth();
+  }, []);
 
   const handleLogin = async (credentials) => {
     try {
@@ -40,7 +42,7 @@ useEffect(() => {
       setLoggedIn(true);
       setUser(user);
       setMessage('');
-    } catch(err) {
+    } catch (err) {
       setMessage(err);
     }
   };
@@ -50,35 +52,36 @@ useEffect(() => {
     setLoggedIn(false);
     setUser({});
     setMessage('');
+    navigate('/');
   };
 
   if (loading)
-  return <Spinner animation='border' className='m-5' />;
-  
+    return <Spinner animation='border' className='m-5' />;
+
   return (
     <Routes>
       <Route element={<MyNavbar loggedIn={loggedIn} user={user} onLogout={handleLogout} />}>
-        
+
         <Route path='/'
           element={loggedIn ? <Navigate replace to='/dashboard' /> : <Home />}
         />
-        
+
         <Route path='/login'
           element={loggedIn ? <Navigate replace to='/dashboard' /> : <Login onLogin={handleLogin} message={message} />}
         />
-        
+
         <Route path='/dashboard'
           element={loggedIn ? <Dashboard user={user} /> : <Navigate replace to='/login' />}
         />
-        
-       <Route path='/game/:id' 
-          element={<GameBoard />} 
-       />
-        
-        <Route path='/stats'
-          element={<Stats />}
+
+        <Route path='/game/:id'
+          element={<GameBoard />}
         />
-        
+
+        <Route path='/stats'
+          element={<Stats user={user} loggedIn={loggedIn} />}
+        />
+
         <Route path='*' element={<NotFound />} />
       </Route>
     </Routes>
