@@ -4,12 +4,11 @@ import { Navbar, Container, Button } from 'react-bootstrap';
 function MyNavbar(props) {
   return (
     <>
-      <Navbar data-bs-theme='dark' style={{ backgroundColor: '#0B3D66' }} className='py-3'>
+      <Navbar data-bs-theme='dark' className='py-3 bg-navy'>
         <Container fluid>
           <Link
             to='/'
-            className='navbar-brand mb-0'
-            style={{ fontFamily: "'Oswald', sans-serif", fontWeight: 700, fontSize: '1.6rem', letterSpacing: '0.02em', textTransform: 'uppercase', color: '#fff' }}>
+            className='navbar-brand mb-0 brand-title text-white'>
             Battaglia Navale
           </Link>
           {props.loggedIn ? (
@@ -20,8 +19,7 @@ function MyNavbar(props) {
               <Button
                 variant='light'
                 size='lg'
-                className='rounded-pill px-4 fw-semibold'
-                style={{ color: '#0B3D66' }}
+                className='rounded-pill px-4 fw-semibold text-navy'
                 onClick={props.onLogout}>
                 Logout
               </Button>
@@ -29,8 +27,7 @@ function MyNavbar(props) {
           ) : (
             <Link
               to='/login'
-              className='btn btn-lg btn-light rounded-pill px-4 fw-semibold'
-              style={{ color: '#0B3D66' }}>
+              className='btn btn-lg btn-light rounded-pill px-4 fw-semibold text-navy'>
               Login
             </Link>
           )}

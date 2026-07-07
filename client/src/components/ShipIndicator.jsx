@@ -15,14 +15,7 @@ function ShipIndicator(props) {
         <span
           key={index}
           title={`Nave da ${size}${isSunk[index] ? ' - affondata' : ''}`}
-          className={`d-inline-flex align-items-center justify-content-center rounded-3 fw-semibold ${isSunk[index] ? 'bg-body-tertiary text-muted text-decoration-line-through' : 'text-white'}`}
-          style={{
-            width: 55,
-            height: 55,
-            fontSize: '22px',
-            backgroundColor: isSunk[index] ? undefined : '#0B3D66',
-            border: isSunk[index] ? '2px solid var(--bs-border-color)' : 'none'
-          }}>
+          className={`ship-tag d-inline-flex align-items-center justify-content-center rounded-3 fw-semibold ${isSunk[index] ? 'ship-tag-sunk bg-body-tertiary text-muted text-decoration-line-through' : 'ship-tag-afloat text-white'}`}>
           {size}
         </span>
       ))}

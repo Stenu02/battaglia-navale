@@ -43,7 +43,6 @@ function App() {
         const cfg = await API.getConfig();
         setConfig(Object.fromEntries(cfg.map(c => [c.key, c])));
       } catch (e) {
-        // anomalia reale, ma cosmetica: i componenti usano i fallback (?.).
         console.error('Configurazione non disponibile:', e);
       }
     };
@@ -75,19 +74,12 @@ function App() {
   return (
     <Routes>
       <Route element={<MyNavbar loggedIn={loggedIn} user={user} onLogout={handleLogout} />}>
-
         <Route path='/' element={loggedIn ? <Navigate replace to='/dashboard' /> : <Home config={config} />} />
-
         <Route path='/login' element={loggedIn ? <Navigate replace to='/dashboard' /> : <Login onLogin={handleLogin} message={message} />} />
-
         <Route path='/dashboard' element={loggedIn ? <Dashboard user={user} config={config} /> : <Navigate replace to='/login' />} />
-
         <Route path='/game/:id' element={<GameBoard config={config} />} />
-
         <Route path='/stats' element={<Stats user={user} loggedIn={loggedIn} />} />
-
         <Route path='*' element={<NotFound />} />
-
       </Route>
     </Routes>
   );

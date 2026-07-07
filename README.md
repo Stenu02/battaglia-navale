@@ -49,22 +49,22 @@
   - response status: 201 Created, 403 Forbidden (if user is authenticated), 422 Unprocessable Entity, 500 Internal Server Error
   - response body example (in case of success): { gameId: 1, gridSize: 8, ships: [2, 2, 3, 4], missiles: 20 } (easy)
 - POST `/api/games/:id/shots`
-  - request parameters: game id in the URL, cookie for passport authentication (optional, required for tournament games)
+  - request parameters: game id in the URL, session cookie (the session that created the game for casual games, passport authentication for tournament games)
   - request body: row, col (coordinates of the shot)
   - response body: shot result, updated game status and, when a ship is sunk, the cells of the sunk ship
-  - response status: 200 OK, 401 Unauthorized,403 Forbidden (game already ended), 404 Not Found (game does not exist), 409 Conflict (cell already fired upon), 422 Unprocessable Entity (invalid coordinates), 500 Internal Server Error
+  - response status: 200 OK, 401 Unauthorized,403 Forbidden (game already ended, or game owned by another user/session), 404 Not Found (game does not exist), 409 Conflict (cell already fired upon), 422 Unprocessable Entity (invalid coordinates), 500 Internal Server Error
   - response body example (in case of success): { result: 'water', missiles: 19, status: 'ongoing', sunkShipCells: null }
 - GET `/api/games/:id`
-  - request parameters: game id in the URL, cookie for passport authentication (optional, required for tournament games)
+  - request parameters: game id in the URL, session cookie (the session that created the game for casual games, passport authentication for tournament games)
   - request body: none
   - response body: game status, difficulty, missiles remaining, grid size, ship sizes, list of shots fired, list of sunken ships sizes
-  - response status: 200 OK, 401 Unauthorized, 403 Forbidden (trying to access another user's game), 404 Not Found (game does not exist), 500 Internal Server Error
+  - response status: 200 OK, 401 Unauthorized,403 Forbidden (trying to access another user's or session's game), 404 Not Found (game does not exist), 500 Internal Server Error
   - response body example (in case of success): { gameId: 1, status: 'ongoing', difficulty: 'easy', missiles: 19, gridSize: 8, ships: [2, 2, 3, 4], shots: [{ row: 2, col: 3, result: 'water' }, ...], sunkenShips: [2, 3] }
 - GET `/api/games/:id/ships`
-  - request parameters: game id in the URL, cookie for passport authentication (optional, required for tournament games)
+  - request parameters: game id in the URL, session cookie (the session that created the game for casual games, passport authentication for tournament games)
   - request body: none
   - response body: list of all ships with their positions
-  - response status: 200 OK, 401 Unauthorized, 403 Forbidden, 404 Not Found (game does not exist), 500 Internal Server Error
+  - response status: 200 OK, 401 Unauthorized, 403 Forbidden (game still ongoing, or game owned by another user/session), 404 Not Found (game does not exist), 500 Internal Server Error
   - response body example (in case of success): { ships: [{ size: 4, row: 2, col: 3, direction: 'H', sunk: 1 }, { size: 2, row: 5, col: 1, direction: 'V', sunk: 0 }, ...] }
 - GET `/api/config`
   - request parameters: none

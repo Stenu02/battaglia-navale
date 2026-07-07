@@ -66,14 +66,27 @@ const isLoggedIn = (req, res, next) => {
   return res.status(401).json({ error: "Non autenticato" });
 }
 
-// Tiene solo il messaggio di ciascun errore di validazione
+// Verifica che il richiedente possa accedere alla partita:
+// - partite con utente: richiede login e proprietà
+// - partite anonime: richiede che la sessione le abbia create
+const checkGameAccess = (req, game) => {
+  if (game.userId) {
+    if (!req.isAuthenticated()) return { status: 401, error: 'Non autenticato' };
+    if (game.userId !== req.user.id) return { status: 403, error: 'Non autorizzato' };
+  } else if (!req.session.casualGames?.includes(game.id)) {
+    return { status: 403, error: 'Non autorizzato' };
+  }
+  return null;
+};
+
+// Formattazione errori, prendiamo solo il messaggio 
 const errorFormatter = ({ msg }) => msg;
 
-// Risponde 422 con un unico messaggio d'errore: { error: "msg1, msg2, ..." }
+
 const onValidationErrors = (result, res) => {
-  const errors = result.formatWith(errorFormatter);            // errorFormatter -> stringa msg
-  const message = Object.values(errors.mapped()).join(', ');   // unisce i messaggi dei campi
-  return res.status(422).json({ error: message });             // stessa forma di tutti gli altri errori
+  const errors = result.formatWith(errorFormatter);
+  const message = Object.values(errors.mapped()).join(', ');
+  return res.status(422).json({ error: message });
 };
 
 /* ROUTES */
@@ -113,13 +126,12 @@ app.post('/api/tournaments', isLoggedIn, [
     // Configurazione in base alla difficoltà
     const config = getGameConfig(req.body.difficulty);
 
-    // Codice generico univoco
-    let code = generateCode();
-    let tournament = await getTournamentByCode(code);
-    while (tournament) {
+    //Generiamo un codice e verifichiamo che non sia associato a nessun torneo
+    let code, tournament;
+    do {
       code = generateCode();
       tournament = await getTournamentByCode(code);
-    }
+    } while (tournament);
 
     // Creazione del torneo
     const tournamentId = await createTournament(code, req.body.difficulty, config.gridSize);
@@ -135,6 +147,7 @@ app.post('/api/tournaments', isLoggedIn, [
     //Creazione di una nuova partita per il creatore del torneo
     const gameId = await createGame(req.user.id, tournamentId, req.body.difficulty, config.gridSize, config.missiles);
 
+    //Associamo le navi generate dalla funzione alla partita del creatore del torneo
     for (const ship of ships) {
       await createShip(gameId, ship.size, ship.row, ship.col, ship.direction);
     }
@@ -160,6 +173,7 @@ app.post('/api/tournaments/:code/join', isLoggedIn, async (req, res) => {
     if (!tournament)
       return res.status(404).json({ error: 'Torneo non trovato' });
 
+    // Verifichiamo che un utente non abbia già una partita associata al torneo
     const existingGame = await getGameByUserAndTournament(req.user.id, tournament.id);
     if (existingGame)
       return res.status(409).json({ error: 'Hai già una partita in questo torneo' })
@@ -172,7 +186,7 @@ app.post('/api/tournaments/:code/join', isLoggedIn, async (req, res) => {
     // Creiamo un nuovo game
     const gameId = await createGame(req.user.id, tournament.id, tournament.difficulty, tournament.gridSize, config.missiles);
 
-
+    //Le navi recuperate le associamo alla partita appena creata
     for (const ship of tournamentShips) {
       await createShip(gameId, ship.size, ship.row, ship.col, ship.direction);
     }
@@ -207,10 +221,13 @@ app.post('/api/games', [
     // Posizionamento navi random
     const ships = generateShips(config.gridSize, config.ships);
 
-
+    // Creazione della partita
     const gameId = await createGame(null, null, req.body.difficulty, config.gridSize, config.missiles);
 
+    // lega la partita anonima alla sessione del browser che l'ha creata
+    req.session.casualGames = [...(req.session.casualGames || []), gameId];
 
+    //Associazioni navi a partita
     for (const ship of ships) {
       await createShip(gameId, ship.size, ship.row, ship.col, ship.direction);
     }
@@ -246,12 +263,9 @@ app.post('/api/games/:id/shots', [
       return res.status(403).json({ error: 'Partita già conclusa' });
 
 
-    if (game.userId && !req.isAuthenticated())
-      return res.status(401).json({ error: 'Non autenticato' });
-
-
-    if (game.userId && game.userId !== req.user.id)
-      return res.status(403).json({ error: 'Non autorizzato' });
+    const denied = checkGameAccess(req, game);
+    if (denied)
+      return res.status(denied.status).json({ error: denied.error });
 
     // Controllo validità coordinate
     if (req.body.row > game.gridSize || req.body.col > game.gridSize)
@@ -269,10 +283,14 @@ app.post('/api/games/:id/shots', [
     let sunkShipCells = null;
 
     if (hitShip) {
+      //se la nave è colpita verifichiamo quanti colpi ha ricevuto 
       const hits = await getHitsByShip(req.params.id, hitShip.row, hitShip.col, hitShip.size, hitShip.direction);
+      //se i colpi ricevuti più quelli attuali sono uguali alla dimensione della nave, allora affondata
       if (hits + 1 === hitShip.size) {
         result = 'sunk';
+        //segnaliamo la nave come affondata
         await markShipAsSunk(req.params.id, hitShip.row, hitShip.col);
+        //Informazione necessaria al client, per capire quali sono le celle della nave appena affondata
         sunkShipCells = Array.from({ length: hitShip.size }, (_, i) => ({
           row: hitShip.direction === 'H' ? hitShip.row : hitShip.row + i,
           col: hitShip.direction === 'H' ? hitShip.col + i : hitShip.col
@@ -281,14 +299,15 @@ app.post('/api/games/:id/shots', [
         result = 'hit';
       }
     } else {
+      //se non è stata colpita decrementiamo il valore dei missili
       newMissiles = game.missiles - 1;
       await updateMissiles(req.params.id, newMissiles);
     }
 
-
+    //Creiamo il colpo
     await createShot(req.params.id, req.body.row, req.body.col, result);
 
-
+    // controllo partita vinta
     let status = 'ongoing';
     if (result === 'sunk') {
       const ships = await getShipsByGame(req.params.id);
@@ -328,18 +347,17 @@ app.get('/api/games/:id', async (req, res) => {
       return res.status(404).json({ error: 'Partita non trovata' });
 
 
-    if (game.userId && !req.isAuthenticated())
-      return res.status(401).json({ error: 'Non autenticato' });
+    const denied = checkGameAccess(req, game);
+    if (denied)
+      return res.status(denied.status).json({ error: denied.error });
 
-
-    if (game.userId && game.userId !== req.user.id)
-      return res.status(403).json({ error: 'Non autorizzato' });
-
-
+    //Restituisce i tiri già sparati, per capire quali navi sono affondate
     const shots = await getShotsByGame(req.params.id);
 
-
+    //Restituisce le navi della partita
     const ships = await getShipsByGame(req.params.id);
+
+    //Restituisce la dimensione delle navi affondate
     const sunkenShips = ships
       .filter(ship => ship.sunk === 1)
       .map(ship => ship.size);
@@ -359,26 +377,25 @@ app.get('/api/games/:id', async (req, res) => {
   }
 });
 
+
 // GET /api/games/:id/ships 
 app.get('/api/games/:id/ships', async (req, res) => {
   try {
-
+    //Controllo se c'è una partita associata all'id
     const game = await getGameById(req.params.id);
     if (!game)
       return res.status(404).json({ error: 'Partita non trovata' });
 
 
-    if (game.userId && !req.isAuthenticated())
-      return res.status(401).json({ error: 'Non autenticato' });
-
-
-    if (game.userId && game.userId !== req.user.id)
-      return res.status(403).json({ error: 'Non autorizzato' });
+    const denied = checkGameAccess(req, game);
+    if (denied)
+      return res.status(denied.status).json({ error: denied.error });
 
     // Controllo sullo stato della partita
     if (game.status === 'ongoing')
       return res.status(403).json({ error: 'Partita ancora in corso' });
 
+    //Resituisiamo la posizione delle navi
     const ships = await getShipsByGame(req.params.id);
 
     return res.status(200).json({
@@ -399,7 +416,7 @@ app.get('/api/games/:id/ships', async (req, res) => {
 // GET /api/stats 
 app.get('/api/stats', async (req, res) => {
   try {
-    const stats = await getStats(); 
+    const stats = await getStats();
     return res.status(200).json({ stats });
   } catch (err) {
     return res.status(500).json({ error: 'Errore interno del server' });

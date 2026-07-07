@@ -37,8 +37,7 @@ function CreateTournament(props) {
       <Card.Body className='d-flex flex-column p-4'>
         <div className='d-flex align-items-center gap-3 mb-4'>
           <span
-            className='d-inline-flex align-items-center justify-content-center rounded-circle bg-primary-subtle text-primary-emphasis fs-3'
-            style={{ width: 56, height: 56, flexShrink: 0 }}>
+            className='d-inline-flex align-items-center justify-content-center rounded-circle bg-primary-subtle text-primary-emphasis fs-3 icon-badge-sm'>
             <i className='bi bi-flag-fill'></i>
           </span>
           <span className='fs-3 fw-semibold'>Crea torneo</span>

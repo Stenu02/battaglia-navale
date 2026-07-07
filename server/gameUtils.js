@@ -26,6 +26,7 @@ export const getGameConfig = (difficulty) => {
 };
 
 
+//Funzione di supporto per la generazione del codice
 export const generateCode = () => {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let code = '';
@@ -38,16 +39,21 @@ export const generateCode = () => {
 
 
 export const generateShips = (gridSize, ships) => {
+  //Creazione griglia di appoggio
   const grid = Array.from({ length: gridSize }, () => Array(gridSize).fill(0));
   const placedShips = [];
 
+  //Ciclo per piazzare le navi
   for (const size of ships) {
     let placed = false;
     while (!placed) {
+      //Direzione casuale
       const direction = Math.random() < 0.5 ? 'H' : 'V';
+      //Celle casuali
       const row = Math.floor(Math.random() * gridSize) + 1;
       const col = Math.floor(Math.random() * gridSize) + 1;
 
+      //Verifica se può essere piazzata nelle celle definite
       if (canPlaceShip(grid, row, col, size, direction, gridSize)) {
         placeShip(grid, row, col, size, direction);
         placedShips.push({ size, row, col, direction });
@@ -58,16 +64,17 @@ export const generateShips = (gridSize, ships) => {
   return placedShips;
 };
 
-// Checks if a ship can be placed at the given position
+
+//Funzione di supporto per verificare che la nave può essere piazzata
 const canPlaceShip = (grid, row, col, size, direction, gridSize) => {
   for (let i = 0; i < size; i++) {
     const r = direction === 'H' ? row : row + i;
     const c = direction === 'H' ? col + i : col;
 
-    // Check if out of bounds
+    //Verifica dimensione della griglia
     if (r > gridSize || c > gridSize) return false;
 
-    // Check if cell or adjacent cells are occupied
+    // Controllo se le celle o le celle adiacenti siano occupate
     for (let dr = -1; dr <= 1; dr++) {
       for (let dc = -1; dc <= 1; dc++) {
         const nr = r + dr;
@@ -81,7 +88,7 @@ const canPlaceShip = (grid, row, col, size, direction, gridSize) => {
   return true;
 };
 
-// Places a ship on the grid
+//Marca le celle occupate
 const placeShip = (grid, row, col, size, direction) => {
   for (let i = 0; i < size; i++) {
     const r = direction === 'H' ? row : row + i;

@@ -34,8 +34,7 @@ function Stats(props) {
           Torna indietro
         </Button>
         <h1
-          className='display-1 mb-5 text-center'
-          style={{ fontFamily: "'Oswald', sans-serif", fontWeight: 700, letterSpacing: '0.02em' }}>
+          className='display-1 mb-5 text-center page-title'>
           Statistiche
         </h1>
 
@@ -55,8 +54,7 @@ function Stats(props) {
               <Card.Body className='p-4'>
                 <div className='d-flex align-items-center gap-3 mb-4'>
                   <span
-                    className={`d-inline-flex align-items-center justify-content-center rounded-circle bg-${d.variant}-subtle text-${d.variant}-emphasis fs-2`}
-                    style={{ width: 68, height: 68, flexShrink: 0 }}>
+                    className={`d-inline-flex align-items-center justify-content-center rounded-circle bg-${d.variant}-subtle text-${d.variant}-emphasis fs-2 icon-badge-lg`}>
                     <i className={`bi ${d.icon}`}></i>
                   </span>
                   <span className={`fs-2 fw-semibold text-${d.variant}`}>{d.label}</span>
@@ -68,7 +66,7 @@ function Stats(props) {
                   <Table borderless className='mb-0 fs-5'>
                     <thead>
                       <tr className='text-secondary'>
-                        <th style={{ width: 40 }}></th>
+                        <th className='rank-col'></th>
                         <th>Giocatore</th>
                         <th className='text-center'>Giocate</th>
                         <th className='text-center'>Vinte</th>

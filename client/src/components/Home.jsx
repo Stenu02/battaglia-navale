@@ -28,8 +28,7 @@ function Home(props) {
       <Col lg={10} className='text-center'>
 
         <h1
-          className='display-1 mb-3'
-          style={{ fontFamily: "'Oswald', sans-serif", fontWeight: 700, letterSpacing: '0.02em' }}>
+          className='display-1 mb-3 page-title'>
           Battaglia Navale
         </h1>
         <p className='fs-4 text-secondary mb-5'>
@@ -48,8 +47,7 @@ function Home(props) {
                   <Card.Body className='d-flex flex-column p-5'>
                     <div className='d-flex align-items-center gap-3 mb-4'>
                       <span
-                        className={`d-inline-flex align-items-center justify-content-center rounded-circle bg-${d.variant}-subtle text-${d.variant}-emphasis fs-2`}
-                        style={{ width: 68, height: 68, flexShrink: 0 }}>
+                        className={`d-inline-flex align-items-center justify-content-center rounded-circle bg-${d.variant}-subtle text-${d.variant}-emphasis fs-2 icon-badge-lg`}>
                         <i className={`bi ${d.icon}`}></i>
                       </span>
                       <span className='fs-2 fw-semibold'>{d.label}</span>
@@ -83,7 +81,7 @@ function Home(props) {
           })}
         </Row>
 
-        <div className='text-center pt-5 border-top' style={{ marginTop: '6rem' }}>
+        <div className='text-center pt-5 border-top mt-6'>
           <div className='d-inline-flex align-items-center gap-4 bg-white border rounded-pill ps-5 pe-3 py-3'>
             <span className='fw-medium fs-4'>Preferisci competere con altri giocatori?</span>
             <Link to='/login' className='btn btn-primary btn-lg rounded-pill fs-4 py-3'>

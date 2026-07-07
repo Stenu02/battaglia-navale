@@ -1,14 +1,6 @@
 import Cell from './Cell.jsx';
 
-const getCellSize = (gridSize) => {
-  if (gridSize <= 8) return 90;
-  if (gridSize <= 10) return 75;
-  return 58;
-};
-
 function Grid(props) {
-  const cellSize = getCellSize(props.gridSize);
-
   const sunkCells = new Set(
     props.sunkShips.flatMap(s => s.cells).map(c => `${c.row}-${c.col}`)
   );
@@ -33,12 +25,10 @@ function Grid(props) {
   };
 
   return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: `repeat(${props.gridSize}, ${cellSize}px)`,
-      gap: '5px',
-      width: 'fit-content'
-    }}>
+    <div
+      className={props.gridSize > 10 ? "game-grid game-grid-hard" : "game-grid"}
+      style={{ '--grid-cols': props.gridSize }}
+    >
       {Array.from({ length: props.gridSize }, (_, r) =>
         Array.from({ length: props.gridSize }, (_, c) => {
           const row = r + 1;
@@ -47,7 +37,6 @@ function Grid(props) {
           return (
             <Cell
               key={`${row}-${col}`}
-              size={cellSize}
               state={state}
               onClick={() => {
                 const alreadyShot = props.shots.some(s => s.row === row && s.col === col);

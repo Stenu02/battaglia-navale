@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Row, Col, Alert, Button, ProgressBar, Card } from 'react-bootstrap';
+import { Alert, Button, ProgressBar, Card } from 'react-bootstrap';
 import Grid from './Grid.jsx';
 import ShipIndicator from './ShipIndicator.jsx';
 import API from '../API/API.js';
@@ -72,61 +72,57 @@ function GameBoard(props) {
   }
 
   return (
-    <Row className='justify-content-center mt-4'>
-      <Col lg={10} style={{ maxWidth: 960 }}>
+    <div className='game-screen'>
+      {error && <Alert variant='danger' className='mb-4'>{error}</Alert>}
 
-        {error && <Alert variant='danger'>{error}</Alert>}
+      <div className='d-flex align-items-center justify-content-center flex-wrap gap-4'>
 
-        <div className='d-flex flex-column align-items-center' style={{ gap: '3rem' }}>
+        <Card className='game-side-panel'>
+          <Card.Body className='p-4'>
+            <p className='text-muted text-uppercase small mb-2'>Missili</p>
+            <p className='mb-2 missile-count'>
+              {game.missiles}<span className='fs-5 text-muted'> / {maxMissiles}</span>
+            </p>
+            <ProgressBar variant='danger' now={(game.missiles / maxMissiles) * 100} className='mb-3 progress-thin' />
+            <p className='mb-0 fs-5 text-secondary'>
+              Navi affondate: <strong className='text-dark'>{sunkShips.length}/{game.ships.length}</strong>
+            </p>
+          </Card.Body>
+        </Card>
 
-          <div className='d-flex flex-column align-items-center gap-3'>
-            <span className={`${game.status === 'ongoing' ? 'fs-4' : 'fs-3 fw-semibold'} text-${statusMessage.color}`}>
-              <i className={`bi ${statusMessage.icon} me-2`}></i>
-              {statusMessage.text}
-            </span>
+        <div className='d-flex flex-column align-items-center gap-3'>
+          <span className={`${game.status === 'ongoing' ? 'fs-4' : 'fs-3 fw-semibold'} text-${statusMessage.color}`}>
+            <i className={`bi ${statusMessage.icon} me-2`}></i>
+            {statusMessage.text}
+          </span>
 
-            <Grid
-              gridSize={game.gridSize}
-              shots={game.shots}
-              sunkShips={sunkShips}
-              allShips={allShips}
-              status={game.status}
-              onShot={handleShot}
-            />
-          </div>
-
-          <Card style={{ maxWidth: 650, width: '100%' }}>
-            <Card.Body className='p-4 d-flex gap-4'>
-              <div style={{ flex: 1 }}>
-                <p className='text-muted text-uppercase small mb-2'>Missili</p>
-                <p className='mb-2' style={{ fontSize: '2rem', fontWeight: 700, lineHeight: 1 }}>
-                  {game.missiles}<span className='fs-5 text-muted'> / {maxMissiles}</span>
-                </p>
-                <ProgressBar variant='danger' now={(game.missiles / maxMissiles) * 100} style={{ height: 14 }} className='mb-3' />
-                <p className='mb-0 fs-5 text-secondary'>
-                  Navi affondate: <strong className='text-dark'>{sunkShips.length}/{game.ships.length}</strong>
-                </p>
-              </div>
-
-              <div style={{ width: 1, backgroundColor: 'var(--bs-border-color)' }}></div>
-
-              <div style={{ flex: 1 }}>
-                <p className='text-muted text-uppercase small mb-3'>Flotta</p>
-                <ShipIndicator ships={game.ships} sunkShips={sunkShips} />
-              </div>
-            </Card.Body>
-          </Card>
-
-          {game.status !== 'ongoing' && (
-            <Button variant='outline-primary' size='lg' onClick={() => navigate(-1)}>
-              Torna indietro
-            </Button>
-          )}
-
+          <Grid
+            gridSize={game.gridSize}
+            shots={game.shots}
+            sunkShips={sunkShips}
+            allShips={allShips}
+            status={game.status}
+            onShot={handleShot}
+          />
         </div>
 
-      </Col>
-    </Row>
+        <Card className='game-side-panel'>
+          <Card.Body className='p-4'>
+            <p className='text-muted text-uppercase small mb-3'>Flotta</p>
+            <ShipIndicator ships={game.ships} sunkShips={sunkShips} />
+          </Card.Body>
+        </Card>
+
+      </div>
+
+      {game.status !== 'ongoing' && (
+        <div className='text-center mt-4'>
+          <Button variant='outline-primary' size='lg' onClick={() => navigate(-1)}>
+            Torna indietro
+          </Button>
+        </div>
+      )}
+    </div>
   );
 }
 

@@ -16,8 +16,7 @@ function Login(props) {
     <Row className='justify-content-center mt-5'>
       <Col md={5}>
         <h1
-          className='display-4 mb-4'
-          style={{ fontFamily: "'Oswald', sans-serif", fontWeight: 700 }}>
+          className='display-4 mb-4 page-title'>
           Login
         </h1>
         {props.message && <Alert variant='danger' className='fs-5'>{props.message}</Alert>}

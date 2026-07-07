@@ -8,8 +8,7 @@ function Dashboard(props) {
     <Row className='justify-content-center mt-4'>
       <Col lg={10}>
         <h1
-          className='display-4 mb-2'
-          style={{ fontFamily: "'Oswald', sans-serif", fontWeight: 700 }}>
+          className='display-4 mb-2 page-title'>
           Benvenuto, {props.user.name}!
         </h1>
         <p className='fs-5 text-secondary mb-5'>Crea un nuovo torneo o unisciti a uno esistente con un codice.</p>

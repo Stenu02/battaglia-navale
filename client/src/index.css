@@ -121,3 +121,80 @@ code {
   --bs-btn-disabled-color: #0B3D66;
   --bs-btn-disabled-border-color: #0B3D66;
 }
+
+
+.page-title {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.brand-title {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: 1.6rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+
+.icon-badge-lg { width: 68px; height: 68px; flex-shrink: 0; }
+.icon-badge-sm { width: 56px; height: 56px; flex-shrink: 0; }
+
+
+.bg-navy   { background-color: #0B3D66; }
+.text-navy { color: #0B3D66 !important; }
+
+
+
+.game-side-panel { width: 240px; }
+.missile-count   { font-size: 2rem; font-weight: 700; line-height: 1; }
+.progress-thin   { height: 14px; }
+
+.game-screen {
+  padding-top: 1rem;
+}
+
+.game-grid {
+  --gap: 5px;
+  --cell: min(
+    120px,
+    calc((100vh - 240px - (var(--grid-cols) - 1) * var(--gap)) / var(--grid-cols)),
+    calc((100vw - 560px - (var(--grid-cols) - 1) * var(--gap)) / var(--grid-cols))
+  );
+  display: grid;
+  grid-template-columns: repeat(var(--grid-cols), var(--cell));
+  gap: var(--gap);
+  width: fit-content;
+}
+
+.game-grid-hard {
+  --cell: min(
+    80px, 
+    calc((100vh - 280px - (var(--grid-cols) - 1) * var(--gap)) / var(--grid-cols)), 
+    calc((100vw - 600px - (var(--grid-cols) - 1) * var(--gap)) / var(--grid-cols))  
+  );
+}
+
+.cell {
+  width: var(--cell);
+  height: var(--cell);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(var(--cell) * 0.35);
+  color: white;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 6px;
+  user-select: none;
+}
+
+.cell-empty { background-color: var(--bs-secondary-bg); cursor: pointer; }
+.cell-water { background-color: #0B3D66;               cursor: not-allowed; }
+.cell-hit   { background-color: var(--bs-warning);     cursor: not-allowed; }
+.cell-sunk  { background-color: var(--bs-danger);      cursor: not-allowed; }
+.cell-ship  { background-color: var(--bs-dark);        cursor: default; }
+
+
+.ship-tag        { width: 55px; height: 55px; font-size: 22px; }
+.ship-tag-afloat { background-color: #0B3D66; }
+.ship-tag-sunk   { border: 2px solid var(--bs-border-color); }

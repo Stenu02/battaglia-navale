@@ -79,6 +79,7 @@ export const createCasualGame = async (difficulty) => {
   const response = await fetch(`${SERVER_URL}/api/games`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     body: JSON.stringify({ difficulty }),
   });
   if (response.ok) {
