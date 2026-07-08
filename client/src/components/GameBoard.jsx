@@ -16,8 +16,7 @@ function GameBoard(props) {
     gridSize: 0,
     difficulty: '',
     ships: [],
-    shots: [],
-    sunkenShips: []
+    shots: []
   });
   const [allShips, setAllShips] = useState([]);
   const [sunkShips, setSunkShips] = useState([]);

@@ -33,21 +33,21 @@
 - POST `/api/tournaments`
   - request parameters: cookie for passport authentication
   - request body: difficulty (easy, medium, hard)
-  - response body: tournament code, game info
+  - response body: tournament code, id of the newly created game
   - response status: 201 Created, 401 Unauthorized, 422 Unprocessable Entity, 500 Internal Server Error
-  - response body example (in case of success): { code: 'CIAO13', gameId: 1, gridSize: 8, ships: [2, 2, 3, 4], missiles: 20 } (easy)
+  - response body example (in case of success): { code: 'CIAO13', gameId: 1 }
 - POST `/api/tournaments/:code/join`
   - request parameters: cookie for passport authentication, code (tournament code in the URL)
   - request body: none
-  - response body: game info
+  - response body: id of the newly created game
   - response status: 201 Created, 401 Unauthorized, 404 Not Found (tournament code does not exist),409 Conflict (user already has a game in this tournament), 500 Internal Server Error
-  - response body example (in case of success): { gameId: 2, gridSize: 8, ships: [2, 2, 3, 4], missiles: 20 } (easy)
+  - response body example (in case of success): { gameId: 2 }
 - POST `/api/games`
   - request parameters: none
   - request body: difficulty (easy, medium, hard)
-  - response body: game info
+  - response body: id of the newly created game
   - response status: 201 Created, 403 Forbidden (if user is authenticated), 422 Unprocessable Entity, 500 Internal Server Error
-  - response body example (in case of success): { gameId: 1, gridSize: 8, ships: [2, 2, 3, 4], missiles: 20 } (easy)
+  - response body example (in case of success): { gameId: 1 }
 - POST `/api/games/:id/shots`
   - request parameters: game id in the URL, session cookie (the session that created the game for casual games, passport authentication for tournament games)
   - request body: row, col (coordinates of the shot)
@@ -57,21 +57,21 @@
 - GET `/api/games/:id`
   - request parameters: game id in the URL, session cookie (the session that created the game for casual games, passport authentication for tournament games)
   - request body: none
-  - response body: game status, difficulty, missiles remaining, grid size, ship sizes, list of shots fired, list of sunken ships sizes
+  - response body: game status, difficulty, missiles remaining, grid size, ship sizes, list of shots fired
   - response status: 200 OK, 401 Unauthorized,403 Forbidden (trying to access another user's or session's game), 404 Not Found (game does not exist), 500 Internal Server Error
-  - response body example (in case of success): { gameId: 1, status: 'ongoing', difficulty: 'easy', missiles: 19, gridSize: 8, ships: [2, 2, 3, 4], shots: [{ row: 2, col: 3, result: 'water' }, ...], sunkenShips: [2, 3] }
+  - response body example (in case of success): { status: 'ongoing', difficulty: 'easy', missiles: 19, gridSize: 8, ships: [2, 2, 3, 4], shots: [{ row: 2, col: 3, result: 'water' }, ...] }
 - GET `/api/games/:id/ships`
   - request parameters: game id in the URL, session cookie (the session that created the game for casual games, passport authentication for tournament games)
   - request body: none
   - response body: list of all ships with their positions
   - response status: 200 OK, 401 Unauthorized, 403 Forbidden (game still ongoing, or game owned by another user/session), 404 Not Found (game does not exist), 500 Internal Server Error
-  - response body example (in case of success): { ships: [{ size: 4, row: 2, col: 3, direction: 'H', sunk: 1 }, { size: 2, row: 5, col: 1, direction: 'V', sunk: 0 }, ...] }
+  - response body example (in case of success): { ships: [{ size: 4, row: 2, col: 3, direction: 'H' }, { size: 2, row: 5, col: 1, direction: 'V' }, ...] }
 - GET `/api/config`
   - request parameters: none
   - request body: none
-  - response body: game configuration for each difficulty level (grid size, number of ships, ship sizes, available missiles)
+  - response body: game configuration for each difficulty level (grid size, number of ships, available missiles)
   - response status: 200 OK
-  - response body example: [{ key: 'easy', gridSize: 8, missiles: 20, shipsCount: 4, shipSizes: [2, 2, 3, 4] }, { key: 'medium', gridSize: 10, missiles: 30, shipsCount: 6, shipSizes: [2, 2, 3, 3, 4, 5] }, { key: 'hard', gridSize: 15, missiles: 40, shipsCount: 10, shipSizes: [2, 2, 2, 3, 3, 3, 4, 4, 5, 5] }]
+  - response body example: [{ key: 'easy', gridSize: 8, missiles: 20, shipsCount: 4 }, { key: 'medium', gridSize: 10, missiles: 30, shipsCount: 6 }, { key: 'hard', gridSize: 15, missiles: 40, shipsCount: 10 }]
 - GET `/api/stats`
   - request parameters: none
   - request body: none

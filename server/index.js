@@ -14,7 +14,7 @@ import session from 'express-session';
 import { getUser } from './userDao.js';
 import { createGame, getGameById, updateGameStatus, updateMissiles, getStats, getGameByUserAndTournament } from './gameDao.js';
 import { createShip, getShipsByGame, markShipAsSunk, getTournamentShips, createTournamentShip, getShipByCell } from './shipDao.js';
-import { createShot, getShotsByGame, getShotByCell, getHitsByShip } from './shotDao.js';
+import { createShot, getShotsByGame, getShotByCell, getHitsByShip, markShipShotsAsSunk } from './shotDao.js';
 import { createTournament, getTournamentByCode } from './tournamentDao.js';
 
 // init express
@@ -66,10 +66,8 @@ const isLoggedIn = (req, res, next) => {
   return res.status(401).json({ error: "Non autenticato" });
 }
 
-// Verifica che il richiedente possa accedere alla partita:
-// - partite con utente: richiede login e proprietà
-// - partite anonime: richiede che la sessione le abbia create
-const checkGameAccess = (req, game) => {
+//Controllo accesso partita
+const checkAccess = (req, game) => {
   if (game.userId) {
     if (!req.isAuthenticated()) return { status: 401, error: 'Non autenticato' };
     if (game.userId !== req.user.id) return { status: 403, error: 'Non autorizzato' };
@@ -154,10 +152,7 @@ app.post('/api/tournaments', isLoggedIn, [
 
     return res.status(201).json({
       code: code,
-      gameId: gameId,
-      gridSize: config.gridSize,
-      ships: config.ships,
-      missiles: config.missiles
+      gameId: gameId
     });
   } catch (err) {
     return res.status(500).json({ error: 'Errore interno del server' });
@@ -192,10 +187,7 @@ app.post('/api/tournaments/:code/join', isLoggedIn, async (req, res) => {
     }
 
     return res.status(201).json({
-      gameId: gameId,
-      gridSize: tournament.gridSize,
-      ships: config.ships,
-      missiles: config.missiles
+      gameId: gameId
     });
   } catch (err) {
     return res.status(500).json({ error: 'Errore interno del server' });
@@ -233,10 +225,7 @@ app.post('/api/games', [
     }
 
     return res.status(201).json({
-      gameId: gameId,
-      gridSize: config.gridSize,
-      ships: config.ships,
-      missiles: config.missiles
+      gameId: gameId
     });
   } catch (err) {
     return res.status(500).json({ error: 'Errore interno del server' });
@@ -263,9 +252,9 @@ app.post('/api/games/:id/shots', [
       return res.status(403).json({ error: 'Partita già conclusa' });
 
 
-    const denied = checkGameAccess(req, game);
-    if (denied)
-      return res.status(denied.status).json({ error: denied.error });
+    const access = checkAccess(req, game);
+    if (access)
+      return res.status(access.status).json({ error: access.error });
 
     // Controllo validità coordinate
     if (req.body.row > game.gridSize || req.body.col > game.gridSize)
@@ -310,8 +299,12 @@ app.post('/api/games/:id/shots', [
     // controllo partita vinta
     let status = 'ongoing';
     if (result === 'sunk') {
+      // marca tutte le celle della nave affondata come 'sunk'
+      await markShipShotsAsSunk(req.params.id, hitShip.row, hitShip.col, hitShip.size, hitShip.direction);
+
       const ships = await getShipsByGame(req.params.id);
       const allSunk = ships.every(ship => ship.sunk === 1);
+      
       if (allSunk) {
         status = 'won';
         await updateGameStatus(req.params.id, 'won');
@@ -347,9 +340,9 @@ app.get('/api/games/:id', async (req, res) => {
       return res.status(404).json({ error: 'Partita non trovata' });
 
 
-    const denied = checkGameAccess(req, game);
-    if (denied)
-      return res.status(denied.status).json({ error: denied.error });
+    const access = checkAccess(req, game);
+    if (access)
+      return res.status(access.status).json({ error: access.error });
 
     //Restituisce i tiri già sparati, per capire quali navi sono affondate
     const shots = await getShotsByGame(req.params.id);
@@ -357,20 +350,13 @@ app.get('/api/games/:id', async (req, res) => {
     //Restituisce le navi della partita
     const ships = await getShipsByGame(req.params.id);
 
-    //Restituisce la dimensione delle navi affondate
-    const sunkenShips = ships
-      .filter(ship => ship.sunk === 1)
-      .map(ship => ship.size);
-
     return res.status(200).json({
-      gameId: game.id,
       status: game.status,
       difficulty: game.difficulty,
       missiles: game.missiles,
       gridSize: game.gridSize,
       ships: ships.map(s => s.size),
-      shots: shots.map(shot => ({ row: shot.row, col: shot.col, result: shot.result })),
-      sunkenShips: sunkenShips
+      shots: shots.map(shot => ({ row: shot.row, col: shot.col, result: shot.result }))
     });
   } catch (err) {
     return res.status(500).json({ error: 'Errore interno del server' });
@@ -387,9 +373,9 @@ app.get('/api/games/:id/ships', async (req, res) => {
       return res.status(404).json({ error: 'Partita non trovata' });
 
 
-    const denied = checkGameAccess(req, game);
-    if (denied)
-      return res.status(denied.status).json({ error: denied.error });
+    const access = checkAccess(req, game);
+    if (access)
+      return res.status(access.status).json({ error: access.error });
 
     // Controllo sullo stato della partita
     if (game.status === 'ongoing')
@@ -403,8 +389,7 @@ app.get('/api/games/:id/ships', async (req, res) => {
         size: ship.size,
         row: ship.row,
         col: ship.col,
-        direction: ship.direction,
-        sunk: ship.sunk
+        direction: ship.direction
       }))
     });
   } catch (err) {
@@ -427,13 +412,13 @@ app.get('/api/stats', async (req, res) => {
 app.get('/api/config', (req, res) => {
   const config = DIFFICULTY_KEYS.map(key => {
     const c = getGameConfig(key);
-    return { key, gridSize: c.gridSize, missiles: c.missiles, shipsCount: c.ships.length, shipSizes: c.ships };
+    return { key, gridSize: c.gridSize, missiles: c.missiles, shipsCount: c.ships.length };
   });
   return res.status(200).json(config);
 });
 
 
-// activate the server
+// attiviamo il server
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
 });

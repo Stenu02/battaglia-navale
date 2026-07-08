@@ -75,3 +75,26 @@ export const getHitsByShip = (gameId, shipRow, shipCol, size, direction) => {
     }
   });
 };
+
+
+// Marca come 'sunk' tutti i colpi sulle celle di una nave affondata
+export const markShipShotsAsSunk = (gameId, shipRow, shipCol, size, direction) => {
+  return new Promise((resolve, reject) => {
+    let sql;
+    if (direction === 'H') {
+      sql = `UPDATE shots SET result = 'sunk'
+             WHERE game_id = ? AND row = ? AND col >= ? AND col < ?`;
+      db.run(sql, [gameId, shipRow, shipCol, shipCol + size], function(err) {
+        if (err) reject(err);
+        else resolve(this.changes);
+      });
+    } else {
+      sql = `UPDATE shots SET result = 'sunk'
+             WHERE game_id = ? AND col = ? AND row >= ? AND row < ?`;
+      db.run(sql, [gameId, shipCol, shipRow, shipRow + size], function(err) {
+        if (err) reject(err);
+        else resolve(this.changes);
+      });
+    }
+  });
+};

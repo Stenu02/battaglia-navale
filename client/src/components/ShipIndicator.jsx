@@ -1,6 +1,7 @@
 function ShipIndicator(props) {
-  const remaining = props.sunkShips.map(s => s.size);
+  const remaining = props.sunkShips.map(s => s.size); //Array con dimensioni delle navi affondate
   const isSunk = props.ships.map(size => {
+    //Rimuoviamo ogni nave affondata, dall'array delle navi
     const idx = remaining.indexOf(size);
     if (idx !== -1) {
       remaining.splice(idx, 1);

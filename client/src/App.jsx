@@ -37,6 +37,7 @@ function App() {
     checkAuth();
   }, []);
 
+  //Carichiamo la configurazione delle difficoltà
   useEffect(() => {
     const loadConfig = async () => {
       try {
