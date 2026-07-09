@@ -28,10 +28,10 @@ function Home(props) {
       <Col lg={10} className='text-center'>
 
         <h1
-          className='display-1 mb-3 page-title'>
+          className='display-4 mb-3 page-title'>
           Battaglia Navale
         </h1>
-        <p className='fs-4 text-secondary mb-5'>
+        <p className='fs-5 text-secondary mb-5'>
           Affonda tutte le navi nemiche prima di esaurire i siluri.
           <br />
           Scegli una difficoltà per iniziare subito, oppure accedi per competere in un torneo.
@@ -47,12 +47,12 @@ function Home(props) {
                   <Card.Body className='d-flex flex-column p-5'>
                     <div className='d-flex align-items-center gap-3 mb-4'>
                       <span
-                        className={`d-inline-flex align-items-center justify-content-center rounded-circle bg-${d.variant}-subtle text-${d.variant}-emphasis fs-2 icon-badge-lg`}>
+                        className={`d-inline-flex align-items-center justify-content-center rounded-circle bg-${d.variant}-subtle text-${d.variant}-emphasis fs-3 icon-badge-lg`}>
                         <i className={`bi ${d.icon}`}></i>
                       </span>
-                      <span className='fs-2 fw-semibold'>{d.label}</span>
+                      <span className='fs-3 fw-semibold'>{d.label}</span>
                     </div>
-                    <ul className='list-unstyled mb-4 text-start fs-4'>
+                    <ul className='list-unstyled mb-4 text-start fs-5'>
                       <li className='d-flex justify-content-between align-items-center border-bottom py-2'>
                         <span className='text-secondary'><i className='bi bi-grid-3x3 me-2'></i>Griglia</span>
                         <strong>{info?.gridSize}×{info?.gridSize}</strong>
@@ -68,7 +68,7 @@ function Home(props) {
                     </ul>
                     <Button
                       variant={`outline-${d.variant}`}
-                      className={`w-100 mt-auto bg-${d.variant}-subtle text-${d.variant}-emphasis fw-semibold py-3 fs-4`}
+                      className={`w-100 mt-auto bg-${d.variant}-subtle text-${d.variant}-emphasis fw-semibold py-3 fs-5`}
                       size='lg'
                       disabled={loading}
                       onClick={() => handleCasualGame(d.key)}>
@@ -83,11 +83,11 @@ function Home(props) {
 
         <div className='text-center pt-5 border-top mt-6'>
           <div className='d-inline-flex align-items-center gap-4 bg-white border rounded-pill ps-5 pe-3 py-3'>
-            <span className='fw-medium fs-4'>Preferisci competere con altri giocatori?</span>
-            <Link to='/login' className='btn btn-primary btn-lg rounded-pill fs-4 py-3'>
+            <span className='fw-medium fs-5'>Preferisci competere con altri giocatori?</span>
+            <Link to='/login' className='btn btn-primary btn-lg rounded-pill fs-5 py-3'>
               Accedi →
             </Link>
-            <Link to='/stats' className='btn btn-outline-secondary btn-lg rounded-pill fs-4 py-3'>
+            <Link to='/stats' className='btn btn-outline-secondary btn-lg rounded-pill fs-5 py-3'>
               Statistiche Globali
             </Link>
           </div>

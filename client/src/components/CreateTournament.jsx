@@ -37,16 +37,16 @@ function CreateTournament(props) {
       <Card.Body className='d-flex flex-column p-4'>
         <div className='d-flex align-items-center gap-3 mb-4'>
           <span
-            className='d-inline-flex align-items-center justify-content-center rounded-circle bg-primary-subtle text-primary-emphasis fs-3 icon-badge-sm'>
+            className='d-inline-flex align-items-center justify-content-center rounded-circle bg-primary-subtle text-primary-emphasis fs-4 icon-badge-sm'>
             <i className='bi bi-flag-fill'></i>
           </span>
-          <span className='fs-3 fw-semibold'>Crea torneo</span>
+          <span className='fs-4 fw-semibold'>Crea torneo</span>
         </div>
 
         {error && <Alert variant='danger'>{error}</Alert>}
 
         <Form.Group className='mb-3'>
-          <Form.Label className='fs-5'>Difficoltà</Form.Label>
+          <Form.Label className='fs-6'>Difficoltà</Form.Label>
           <Form.Select
             size='lg'
             value={difficulty}
@@ -78,7 +78,7 @@ function CreateTournament(props) {
           <Modal.Title>Torneo creato!</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p className='fs-5'>Condividi questo codice con gli altri giocatori:</p>
+          <p className='fs-6'>Condividi questo codice con gli altri giocatori:</p>
           <h2 className='text-center display-5'>{tournamentData.code}</h2>
         </Modal.Body>
         <Modal.Footer>

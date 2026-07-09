@@ -34,7 +34,7 @@ function Stats(props) {
           Torna indietro
         </Button>
         <h1
-          className='display-1 mb-5 text-center page-title'>
+          className='display-4 mb-5 text-center page-title'>
           Statistiche
         </h1>
 
@@ -54,14 +54,14 @@ function Stats(props) {
               <Card.Body className='p-4'>
                 <div className='d-flex align-items-center gap-3 mb-4'>
                   <span
-                    className={`d-inline-flex align-items-center justify-content-center rounded-circle bg-${d.variant}-subtle text-${d.variant}-emphasis fs-2 icon-badge-lg`}>
+                    className={`d-inline-flex align-items-center justify-content-center rounded-circle bg-${d.variant}-subtle text-${d.variant}-emphasis fs-3 icon-badge-lg`}>
                     <i className={`bi ${d.icon}`}></i>
                   </span>
-                  <span className={`fs-2 fw-semibold text-${d.variant}`}>{d.label}</span>
+                  <span className={`fs-3 fw-semibold text-${d.variant}`}>{d.label}</span>
                 </div>
 
                 {players.length === 0 ? (
-                  <p className='text-secondary fs-4 mb-0'>Nessuna partita giocata ancora.</p>
+                  <p className='text-secondary fs-5 mb-0'>Nessuna partita giocata ancora.</p>
                 ) : (
                   <Table borderless className='mb-0 fs-5'>
                     <thead>

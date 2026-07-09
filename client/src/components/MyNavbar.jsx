@@ -13,7 +13,7 @@ function MyNavbar(props) {
           </Link>
           {props.loggedIn ? (
             <div className='d-flex align-items-center gap-3'>
-              <Navbar.Text className='fs-5 mb-0'>
+              <Navbar.Text className='fs-6 mb-0'>
                 {props.user.name}
               </Navbar.Text>
               <Button

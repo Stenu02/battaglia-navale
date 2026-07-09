@@ -16,13 +16,13 @@ function Login(props) {
     <Row className='justify-content-center mt-5'>
       <Col md={5}>
         <h1
-          className='display-4 mb-4 page-title'>
+          className='display-5 mb-4 page-title'>
           Login
         </h1>
-        {props.message && <Alert variant='danger' className='fs-5'>{props.message}</Alert>}
+        {props.message && <Alert variant='danger' className='fs-6'>{props.message}</Alert>}
         <Form onSubmit={handleSubmit}>
           <Form.Group controlId='username' className='mb-4'>
-            <Form.Label className='fs-5'>Username</Form.Label>
+            <Form.Label className='fs-6'>Username</Form.Label>
             <Form.Control
               size='lg'
               type='email'
@@ -32,7 +32,7 @@ function Login(props) {
               onChange={ev => setUsername(ev.target.value)} />
           </Form.Group>
           <Form.Group controlId='password' className='mb-4'>
-            <Form.Label className='fs-5'>Password</Form.Label>
+            <Form.Label className='fs-6'>Password</Form.Label>
             <Form.Control
               size='lg'
               type='password'

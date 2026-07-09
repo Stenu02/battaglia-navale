@@ -83,17 +83,17 @@ function GameBoard(props) {
           <Card.Body className='p-4'>
             <p className='text-muted text-uppercase small mb-2'>Missili</p>
             <p className='mb-2 missile-count'>
-              {game.missiles}<span className='fs-5 text-muted'> / {maxMissiles}</span>
+              {game.missiles}<span className='fs-6 text-muted'> / {maxMissiles}</span>
             </p>
             <ProgressBar variant='danger' now={(game.missiles / maxMissiles) * 100} className='mb-3 progress-thin' />
-            <p className='mb-0 fs-5 text-secondary'>
+            <p className='mb-0 fs-6 text-secondary'>
               Navi affondate: <strong className='text-dark'>{sunkShips.length}/{game.ships.length}</strong>
             </p>
           </Card.Body>
         </Card>
 
         <div className='d-flex flex-column align-items-center gap-3'>
-          <span className={`${game.status === 'ongoing' ? 'fs-4' : 'fs-3 fw-semibold'} text-${statusMessage.color}`}>
+          <span className={`${game.status === 'ongoing' ? 'fs-5' : 'fs-4 fw-semibold'} text-${statusMessage.color}`}>
             <i className={`bi ${statusMessage.icon} me-2`}></i>
             {statusMessage.text}
           </span>

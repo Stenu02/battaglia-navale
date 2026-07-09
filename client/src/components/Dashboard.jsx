@@ -8,10 +8,10 @@ function Dashboard(props) {
     <Row className='justify-content-center mt-4'>
       <Col lg={10}>
         <h1
-          className='display-4 mb-2 page-title'>
+          className='display-5 mb-2 page-title'>
           Benvenuto, {props.user.name}!
         </h1>
-        <p className='fs-5 text-secondary mb-5'>Crea un nuovo torneo o unisciti a uno esistente con un codice.</p>
+        <p className='fs-6 text-secondary mb-5'>Crea un nuovo torneo o unisciti a uno esistente con un codice.</p>
 
         <Row className='g-4 mb-5'>
           <Col md={6}>
@@ -23,7 +23,7 @@ function Dashboard(props) {
         </Row>
 
         <div className='text-center pt-4 border-top'>
-          <Link to='/stats' className='btn btn-outline-primary btn-lg rounded-pill px-4 py-3 fs-4 mt-4'>
+          <Link to='/stats' className='btn btn-outline-primary btn-lg rounded-pill px-4 py-3 fs-5 mt-4'>
             Statistiche globali
           </Link>
         </div>
