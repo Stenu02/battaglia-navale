@@ -41,15 +41,18 @@ function GameBoard(props) {
   const handleShot = async (row, col) => {
     try {
       const shotData = await API.fireShot(id, row, col);
+      // Aggiorniamo lo stato di gioco
       setGame(prev => ({
         ...prev,
         missiles: shotData.missiles,
         status: shotData.status,
         shots: [...prev.shots, { row, col, result: shotData.result }]
       }));
+      // Se il colpo ha affondato una nave, salviamo le sue celle
       if (shotData.sunkShipCells) {
         setSunkShips(prev => [...prev, { size: shotData.sunkShipCells.length, cells: shotData.sunkShipCells }]);
       }
+      // Partita finita
       if (shotData.status !== 'ongoing') {
         const shipsData = await API.getShips(id);
         setAllShips(shipsData);
@@ -116,7 +119,7 @@ function GameBoard(props) {
 
       {game.status !== 'ongoing' && (
         <div className='text-center mt-4'>
-          <Button variant='outline-primary' size='lg' onClick={() => navigate(-1)}>
+          <Button variant='outline-primary' size='lg' onClick={() => navigate('/')}>
             Torna indietro
           </Button>
         </div>
